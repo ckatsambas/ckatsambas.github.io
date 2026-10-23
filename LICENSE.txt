@@ -1,0 +1,26 @@
+Copyright (c) 2026 Christos Katsampas. All rights reserved.
+
+This repository and the website built from it, including all text, figures,
+charts, documents, spreadsheets, models and source code (together, "the
+Material"), are the original work of Christos Katsampas unless stated otherwise.
+
+NO LICENCE IS GRANTED except the limited permission below.
+
+You MAY:
+  - view and read the Material on this website and on GitHub;
+  - refer to it and cite it with full attribution
+    ("Christos Katsampas, <project title>, 2026") and a link to the source;
+  - take inspiration from the ideas and methods described, and build your own
+    independent work from scratch.
+
+You MAY NOT, without prior written permission:
+  - copy, reproduce or republish the Material, in whole or in part;
+  - modify it, remove or obscure its watermarks or copyright notices, or
+    circumvent the protection applied to the files;
+  - distribute, sell, sublicense or use it for any commercial purpose;
+  - present it, or work derived from it, as your own;
+  - use it to train or evaluate machine-learning models.
+
+The read-only files under /files are provided for viewing only.
+
+Requests for permission: xristos.katsambas@gmail.com

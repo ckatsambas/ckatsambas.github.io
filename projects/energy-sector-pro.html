@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Energy Sector PRO</title>
+<meta name="description" content="Quantitative equity research on CEG, VST and CCJ: factor analysis, portfolio optimisation and Monte Carlo simulation.">
+<meta name="author" content="Christos Katsampas">
+<meta name="robots" content="index, follow, noai, noimageai">
+<meta property="og:title" content="Energy Sector PRO">
+<meta property="og:description" content="Quantitative equity research on CEG, VST and CCJ: factor analysis, portfolio optimisation and Monte Carlo simulation.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="../index.html">HOME</a>
+    <nav class="nav" aria-label="Main">
+      <a href="../index.html#work">Work</a>
+      <a href="../index.html#about">About</a>
+      <a href="../index.html#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+<main>
+
+<div class="wrap">
+  <header class="case-head">
+    <p class="crumb"><a href="../index.html#work">Projects</a> / P-02</p>
+    <h1>Energy Sector PRO</h1>
+    <p class="lede">Quantitative research on three AI-power-demand stocks: benchmark and factor analysis, mean-variance optimisation and a 10,000-path Monte Carlo simulation.</p>
+  </header>
+  <div class="case-body">
+    <article class="case-main">
+
+<section class="access">
+  <h2>Read the full project</h2>
+  <p>These are complete, read-only copies. Each page carries a watermark, and the files are locked against editing and copying. See the <a href="../LICENSE.txt">licence</a> for the terms of use.</p>
+  <ul class="file-list"><li><a class="file-link" href="../files/energy-sector-pro-report.pdf" target="_blank" rel="noopener">Research workbook (PDF)</a><span>All 11 tabs &middot; 22 pages</span></li>
+<li><a class="file-link" href="../files/energy-sector-pro-source-code.pdf" target="_blank" rel="noopener">Python source code (PDF)</a><span>README + 3 scripts &middot; 26 pages</span></li>
+<li><a class="file-link" href="../files/energy-sector-pro-workbook.xlsx" target="_blank" rel="noopener">Live workbook (Excel, protected)</a><span>See every formula &middot; editing locked</span></li></ul>
+  <div class="pdf-frame"><iframe src="../files/energy-sector-pro-report.pdf#view=FitH" title="Read-only document viewer" loading="lazy"></iframe></div>
+  <p class="eyebrow">On a phone, open the PDF with the links above.</p>
+</section>
+<section>
+  <h2>The question</h2>
+  <p>AI and data-centre demand has made power producers and nuclear fuel a market theme. I wanted to know how a three-stock sleeve (Constellation Energy, Vistra, Cameco) actually behaves. How does it compare with the energy-sector benchmark (XLE)? What drives it? And what does its range of outcomes look like, beyond a single bull or bear price target?</p>
+</section>
+<section>
+  <h2>Method</h2>
+  <ul>
+    <li><b>Data.</b> Monthly prices from Jan-2025 to Sep-2026 for the three stocks, XLE and four macro factors (WTI crude, Henry Hub gas, the US 10-year yield, uranium spot), all from a single CSV.</li>
+    <li><b>Risk.</b> Returns, volatility, Sharpe and Sortino ratios, running-peak maximum drawdown, and historical VaR/CVaR at 95% and 99%.</li>
+    <li><b>Benchmark and factors.</b> Beta, Jensen's alpha, tracking error, information ratio and up/down capture against XLE, plus sensitivities to oil, gas, uranium and rates.</li>
+    <li><b>Optimisation.</b> A 66-point mean-variance frontier that identifies the maximum-Sharpe and minimum-volatility portfolios.</li>
+    <li><b>Simulation.</b> 10,000 correlated 12-month paths (Cholesky-decomposed covariance) for the recommended 40/35/25 weights.</li>
+  </ul>
+  <p>A Python pipeline (pandas, NumPy, openpyxl) generates the workbook. Changing the data file and re-running two scripts rebuilds every statistic and chart.</p>
+</section>
+<section>
+  <h2>Results</h2>
+  <div class="metrics">
+    <div class="metric"><b>+5.9%</b><span>Median 12-month return</span></div>
+    <div class="metric"><b>44%</b><span>Probability of a loss</span></div>
+    <div class="metric"><b>&minus;46%</b><span>Simulated 95% VaR</span></div>
+    <div class="metric"><b>&minus;54%</b><span>Simulated 95% CVaR</span></div>
+  </div>
+  <h3>Range of outcomes over 12 months</h3>
+  <div class="chart"><svg viewBox="0 0 640 330" role="img" aria-labelledby="fanT"><title id="fanT">Monte Carlo fan chart: 12-month portfolio value, 5th to 95th percentile</title>
+<line class="grid" x1="52" x2="620" y1="274.8" y2="274.8"/><text x="44" y="278.8" text-anchor="end">0.5×</text>
+<line class="grid" x1="52" x2="620" y1="198.7" y2="198.7"/><text x="44" y="202.7" text-anchor="end">1.0×</text>
+<line class="grid" x1="52" x2="620" y1="122.6" y2="122.6"/><text x="44" y="126.6" text-anchor="end">1.5×</text>
+<line class="grid" x1="52" x2="620" y1="46.4" y2="46.4"/><text x="44" y="50.4" text-anchor="end">2.0×</text>
+<text x="52.0" y="308" text-anchor="middle">M0</text>
+<text x="194.0" y="308" text-anchor="middle">M3</text>
+<text x="336.0" y="308" text-anchor="middle">M6</text>
+<text x="478.0" y="308" text-anchor="middle">M9</text>
+<text x="620.0" y="308" text-anchor="middle">M12</text>
+<text x="336.0" y="326" text-anchor="middle">Months ahead</text>
+<polygon class="band-outer" points="52.0,198.7 99.3,167.8 146.7,152.3 194.0,139.0 241.3,126.7 288.7,116.6 336.0,106.7 383.3,95.2 430.7,83.5 478.0,74.8 525.3,61.8 572.7,51.6 620.0,41.4 620.0,268.8 572.7,267.1 525.3,265.7 478.0,263.0 430.7,259.9 383.3,256.9 336.0,253.4 288.7,250.5 241.3,246.4 194.0,241.4 146.7,235.6 99.3,226.9 52.0,198.7"/>
+<polygon class="band-inner" points="52.0,198.7 99.3,185.5 146.7,179.3 194.0,174.4 241.3,170.2 288.7,166.3 336.0,162.4 383.3,159.2 430.7,155.2 478.0,150.6 525.3,146.3 572.7,141.8 620.0,139.5 620.0,229.2 572.7,228.4 525.3,227.3 478.0,225.9 430.7,225.0 383.3,223.4 336.0,221.6 288.7,220.2 241.3,218.4 194.0,215.8 146.7,213.1 99.3,209.2 52.0,198.7"/>
+<line class="zero" x1="52" x2="620" y1="198.7" y2="198.7"/>
+<polyline class="median" points="52.0,198.7 99.3,197.3 146.7,196.5 194.0,195.7 241.3,195.2 288.7,195.0 336.0,194.6 383.3,194.0 430.7,193.7 478.0,192.7 525.3,192.0 572.7,190.8 620.0,189.7"/>
+<text class="" x="614.0" y="35.4" text-anchor="end">95th +103%</text>
+<text class="" x="614.0" y="133.5" text-anchor="end">75th +39%</text>
+<text class="label-strong" x="614.0" y="183.7" text-anchor="end">Median +6%</text>
+<text class="" x="614.0" y="223.2" text-anchor="end">25th -20%</text>
+<text class="" x="614.0" y="262.8" text-anchor="end">5th -46%</text>
+</svg></div>
+  <p class="eyebrow" style="margin-top:.5rem">Shaded bands: 5th&ndash;95th and 25th&ndash;75th percentiles. Line: median. Portfolio value starts at 1.0&times;.</p>
+  <h3>Distribution of 12-month returns</h3>
+  <div class="chart"><svg viewBox="0 0 640 300" role="img" aria-labelledby="histT"><title id="histT">Distribution of simulated 12-month portfolio returns, 10,000 paths</title>
+<line class="grid" x1="52" x2="620" y1="260.0" y2="260.0"/><text x="44" y="264.0" text-anchor="end">0</text>
+<line class="grid" x1="52" x2="620" y1="199.0" y2="199.0"/><text x="44" y="203.0" text-anchor="end">500</text>
+<line class="grid" x1="52" x2="620" y1="138.0" y2="138.0"/><text x="44" y="142.0" text-anchor="end">1,000</text>
+<line class="grid" x1="52" x2="620" y1="77.0" y2="77.0"/><text x="44" y="81.0" text-anchor="end">1,500</text>
+<line class="grid" x1="52" x2="620" y1="16.0" y2="16.0"/><text x="44" y="20.0" text-anchor="end">2,000</text>
+<rect class="bar-loss" x="53.0" y="253.5" width="29.5" height="6.5"/>
+<rect class="bar-loss" x="84.5" y="187.5" width="29.5" height="72.5"/>
+<rect class="bar-loss" x="116.1" y="85.2" width="29.5" height="174.8"/>
+<rect class="bar-loss" x="147.6" y="37.8" width="29.5" height="222.2"/>
+<rect class="bar-gain" x="179.2" y="42.8" width="29.5" height="217.2"/>
+<rect class="bar-gain" x="210.7" y="85.4" width="29.5" height="174.6"/>
+<rect class="bar-gain" x="242.3" y="133.2" width="29.5" height="126.8"/>
+<rect class="bar-gain" x="273.8" y="174.1" width="29.5" height="85.9"/>
+<rect class="bar-gain" x="305.4" y="205.7" width="29.5" height="54.3"/>
+<rect class="bar-gain" x="336.9" y="228.2" width="29.5" height="31.8"/>
+<rect class="bar-gain" x="368.5" y="239.4" width="29.5" height="20.6"/>
+<rect class="bar-gain" x="400.0" y="247.6" width="29.5" height="12.4"/>
+<rect class="bar-gain" x="431.6" y="251.5" width="29.5" height="8.5"/>
+<rect class="bar-gain" x="463.1" y="255.5" width="29.5" height="4.5"/>
+<rect class="bar-gain" x="494.7" y="256.8" width="29.5" height="3.2"/>
+<rect class="bar-gain" x="526.2" y="257.9" width="29.5" height="2.1"/>
+<rect class="bar-gain" x="557.7" y="258.9" width="29.5" height="1.1"/>
+<rect class="bar-gain" x="589.3" y="259.5" width="29.5" height="0.5"/>
+<rect class="bar-gain" x="620.8" y="259.8" width="-1.8" height="0.2"/>
+<text x="104.1" y="278" text-anchor="middle">-50%</text>
+<text x="187.3" y="278" text-anchor="middle">+0%</text>
+<text x="270.5" y="278" text-anchor="middle">+50%</text>
+<text x="353.8" y="278" text-anchor="middle">+100%</text>
+<text x="437.0" y="278" text-anchor="middle">+150%</text>
+<text x="520.2" y="278" text-anchor="middle">+200%</text>
+<text x="603.4" y="278" text-anchor="middle">+250%</text>
+<line class="zero" x1="187.3" x2="187.3" y1="16" y2="260.0"/>
+<text x="336.0" y="296" text-anchor="middle">12-month portfolio return</text>
+<text x="620" y="28" text-anchor="end">3 paths beyond +260% not shown</text>
+</svg></div>
+  <p>The distribution is strongly right-skewed. The mean (+14%) sits well above the median (+6%), and almost half of all paths still lose money. A single bull, base and bear price target would hide that.</p>
+  <h3>Why I did not just follow the optimiser</h3>
+  <p>On this sample the maximum-Sharpe portfolio is 100% Cameco, the name with the best trailing 20 months. Mean-variance optimisation on so few observations tends to pile into recent winners. The recommendation (40% CEG, 35% VST, 25% CCJ) deliberately underweights Cameco because of its earnings volatility and valuation.</p>
+</section>
+<section>
+  <h2>Limitations</h2>
+  <ul>
+    <li>Twenty monthly returns are a thin sample, so every estimate is directional rather than precise.</li>
+    <li>Factor betas are univariate, and the macro factors are correlated with each other.</li>
+    <li>The simulation assumes normal returns, so it does not capture fat tails or regime shifts.</li>
+    <li>The WTI and uranium series are reconstructed approximations and should be replaced with a vendor feed before real use.</li>
+  </ul>
+  <p><i>This is independent research for learning and discussion. It is not investment advice.</i></p>
+</section>
+
+    </article>
+    <aside class="spec" aria-label="Project facts"><dl><div><dt>Status</dt><dd><span class="chip ok">Complete</span></dd></div>
+<div><dt>Report date</dt><dd>1 Oct 2026</dd></div>
+<div><dt>Coverage</dt><dd>CEG, VST, CCJ vs. XLE</dd></div>
+<div><dt>Stack</dt><dd>Python (pandas, NumPy, openpyxl), Excel</dd></div>
+<div><dt>Deliverable</dt><dd>11-tab Excel workbook + Python pipeline</dd></div>
+<div><dt>Access</dt><dd><span class="chip open">Read-only</span></dd></div>
+<div><dt>Licence</dt><dd><a href="../LICENSE.txt">All rights reserved</a></dd></div></dl></aside>
+  </div>
+  <nav class="next-prev" aria-label="More projects"><a href="financial-architect.html">&larr; Financial Architect</a><a href="thesis-shipping.html">Shipping decarbonisation thesis &rarr;</a></nav>
+</div>
+
+</main>
+<footer class="site-foot">
+  <div class="wrap">
+    <p>&copy; 2026 Christos Katsampas. All rights reserved. Text, figures, screenshots and models on this site may not be copied, republished or used commercially without written permission.</p>
+    <p><a href="../LICENSE.txt">Licence</a> &middot; <a href="../index.html">All projects</a></p>
+  </div>
+</footer>
+</body>
+</html>
