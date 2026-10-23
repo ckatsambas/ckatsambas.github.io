@@ -220,6 +220,15 @@ td.num { text-align: right; font-variant-numeric: tabular-nums; font-family: var
 @media (max-width: 720px) { .pdf-frame { display: none; } }
 
 /* Personal introduction */
-.intro { display: grid; gap: 0.9rem; max-width: 64ch; }
+.intro { display: grid; gap: 0.9rem; max-width: none; }
+@media (min-width: 720px) { .intro p { text-align: justify; hyphens: auto; -webkit-hyphens: auto; } }
 .intro p { margin: 0; font-size: 1.08rem; line-height: 1.65; color: var(--muted); }
 .intro p:first-child { color: var(--ink); font-size: var(--step-1); line-height: 1.55; }
+
+/* Methods & tools */
+.toolkit { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 2rem; }
+.toolkit h3 { font-size: var(--step-0); font-family: var(--font-mono); font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 0.6rem; }
+.toolkit ul { margin: 0; padding-left: 1.1rem; }
+.toolkit li { margin-bottom: 0.3rem; }
+.about-text { max-width: none; }
+@media (min-width: 720px) { .about-text p { text-align: justify; hyphens: auto; } }
