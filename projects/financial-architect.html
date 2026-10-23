@@ -77,8 +77,9 @@
   </ul>
 </section>
 <section>
-  <h2>What version 2 corrected</h2>
-  <p>Rebuilding the original browser tool as tested software exposed calculation errors. The TEPIX III interest subsidy is now applied month by month as the programme specifies, which changed the interest on a sample &euro;1M loan from &euro;133,949 to &euro;117,114. Instruments are ranked by net cost after the grant rather than by interest alone. The leasing comparison now follows art. 24 of Law 4172/2013, under which a finance lessee depreciates the asset instead of deducting the full rental.</p>
+  <h2>How the calculations work</h2>
+  <p>Every loan is computed from a full monthly schedule: interest only during the grace period, then a constant instalment. For TEPIX III, the interest-free share of the Hellenic Development Bank repays in equal instalments, and the 3-point interest subsidy is applied month by month to the bank share for the first 24 months. On a sample &euro;1M, 7-year loan, the client pays &euro;117,114 in interest after a &euro;34,835 subsidy.</p>
+  <p>Instruments are ranked by net cost: the interest the client pays, plus the cost of bridge-financing a grant until it is paid out, minus the grant itself. A grant-based option and a cheap loan are therefore compared on the same basis. The leasing module follows art. 24 of Law 4172/2013, under which a finance lessee depreciates the asset and deducts the interest, and compares leasing with a bank loan on after-tax present value.</p>
   <figure>
     <img src="../assets/img/fa-roadmap.jpg" alt="Roadmap screen with a document checklist and a Gantt chart of application phases" width="1440" height="858" loading="lazy">
     <figcaption>Roadmap: documents to collect and an estimated timeline.</figcaption>
@@ -86,7 +87,7 @@
 </section>
 
     </article>
-    <aside class="spec" aria-label="Project facts"><dl><div><dt>Status</dt><dd><span class="chip ok">Complete &middot; v2.0</span></dd></div>
+    <aside class="spec" aria-label="Project facts"><dl><div><dt>Status</dt><dd><span class="chip ok">Complete</span></dd></div>
 <div><dt>Type</dt><dd>Desktop application (Windows, macOS)</dd></div>
 <div><dt>Context</dt><dd>Funding advisory, ESPA / NSRF</dd></div>
 <div><dt>Stack</dt><dd>Python, PySide6 (Qt), openpyxl, PyInstaller</dd></div>
