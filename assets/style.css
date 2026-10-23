@@ -223,7 +223,7 @@ td.num { text-align: right; font-variant-numeric: tabular-nums; font-family: var
 .intro { display: grid; gap: 0.9rem; max-width: none; }
 @media (min-width: 720px) { .intro p { text-align: justify; hyphens: auto; -webkit-hyphens: auto; } }
 .intro p { margin: 0; font-size: 1.08rem; line-height: 1.65; color: var(--muted); }
-.intro p:first-child { color: var(--ink); font-size: var(--step-1); line-height: 1.55; }
+.intro p { color: var(--ink); font-size: 1.12rem; line-height: 1.7; }
 
 /* Methods & tools */
 .toolkit { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 2rem; }
@@ -232,3 +232,12 @@ td.num { text-align: right; font-variant-numeric: tabular-nums; font-family: var
 .toolkit li { margin-bottom: 0.3rem; }
 .about-text { max-width: none; }
 @media (min-width: 720px) { .about-text p { text-align: justify; hyphens: auto; } }
+
+/* About: records */
+.records h3 { font-family: var(--font-mono); font-size: 0.75rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin: 1.4rem 0 0.4rem; }
+.records h3:first-child { margin-top: 0; }
+.records ul { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); }
+.records li { display: grid; grid-template-columns: 11rem minmax(0, 1fr); gap: 1rem; padding: 0.55rem 0; border-bottom: 1px solid var(--rule); }
+.rec-date { font-family: var(--font-mono); font-size: 0.82rem; color: var(--muted); font-variant-numeric: tabular-nums; padding-top: 0.1rem; }
+.rec-what { min-width: 0; }
+@media (max-width: 560px) { .records li { grid-template-columns: minmax(0, 1fr); gap: 0.1rem; } }
