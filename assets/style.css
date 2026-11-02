@@ -1,4 +1,4 @@
-/* Layout concept: an analyst's project register. Left-aligned single column,
+/* Layout concept: an analyst's portfolio. Left-aligned single column,
    projects listed like a ledger with status + access columns; each case study
    pairs a narrative column with a compact spec sheet. */
 :root {
@@ -99,26 +99,6 @@ h1, h2, h3 { font-family: var(--font-display); line-height: 1.15; text-wrap: bal
 .section-head p { margin: 0; color: var(--muted); font-size: var(--step--1); max-width: 52ch; }
 .eyebrow { font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin: 0 0 0.4rem; }
 
-/* Project register */
-.register { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--ink); }
-.register li { border-bottom: 1px solid var(--rule); }
-.reg-row {
-  display: grid;
-  grid-template-columns: 3.2rem minmax(0, 1fr) 9rem 8.5rem;
-  gap: 1rem; align-items: center;
-  padding: 1.1rem 0.25rem;
-  color: inherit; text-decoration: none;
-}
-a.reg-row:hover { background: var(--surface); }
-a.reg-row:hover .reg-title { color: var(--accent); }
-.reg-id { font-family: var(--font-mono); font-size: var(--step--1); color: var(--muted); font-variant-numeric: tabular-nums; }
-.reg-main { min-width: 0; }
-.reg-main > span { display: block; }
-.reg-title { font-family: var(--font-display); font-weight: 600; font-size: var(--step-1); line-height: 1.25; }
-.reg-desc { color: var(--muted); font-size: 0.93rem; margin-top: 0.15rem; }
-.reg-tags { font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); margin-top: 0.35rem; }
-.reg-group { font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); padding: 1.4rem 0.25rem 0.5rem; border-bottom: 1px solid var(--rule); }
-
 .chip { display: inline-flex; align-items: center; gap: 0.4em; font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; padding: 0.25em 0.6em; border-radius: 3px; white-space: nowrap; justify-self: start; }
 .chip::before { content: ""; width: 0.5em; height: 0.5em; border-radius: 50%; background: currentColor; }
 .chip.ok { color: var(--ok); background: var(--ok-soft); }
@@ -128,19 +108,7 @@ a.reg-row:hover .reg-title { color: var(--accent); }
 .chip.lock::before { border-radius: 1px; }
 .chip.open { color: var(--accent); background: var(--accent-soft); }
 
-@media (max-width: 720px) {
-  .reg-row { grid-template-columns: 2.4rem minmax(0, 1fr); row-gap: 0.5rem; }
-  .reg-row .chip { grid-column: 2; }
-  .reg-row .chip + .chip { margin-top: -0.25rem; }
-}
-
 /* Skills + about */
-.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 2rem; }
-.cols h3 { font-size: var(--step-0); font-family: var(--font-mono); font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 0.6rem; }
-.cols ul { margin: 0; padding-left: 1.1rem; }
-.cols li { margin-bottom: 0.3rem; }
-.prose { max-width: 66ch; }
-.prose p { margin: 0 0 1rem; }
 
 .contact-line { display: flex; flex-wrap: wrap; gap: 0.75rem 2rem; font-family: var(--font-mono); font-size: 0.95rem; }
 
@@ -177,9 +145,6 @@ figure { margin: 1.5rem 0; }
 figure img { border: 1px solid var(--rule); }
 figcaption { font-size: var(--step--1); color: var(--muted); margin-top: 0.5rem; max-width: 68ch; }
 
-.notice { border-left: 3px solid var(--lock); background: var(--lock-soft); padding: 0.9rem 1.1rem; font-size: 0.95rem; max-width: 68ch; }
-.notice p { margin: 0; }
-.notice strong { color: var(--lock); }
 
 .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); margin: 1.25rem 0; }
 .metric { background: var(--surface); padding: 0.9rem 1rem; }
@@ -234,8 +199,6 @@ td.num { text-align: right; font-variant-numeric: tabular-nums; font-family: var
 .toolkit h3 { font-size: var(--step-0); font-family: var(--font-mono); font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 0.6rem; }
 .toolkit ul { margin: 0; padding-left: 1.1rem; }
 .toolkit li { margin-bottom: 0.3rem; }
-.about-text { max-width: none; }
-@media (min-width: 720px) { .about-text p { text-align: justify; hyphens: auto; } }
 
 /* About: records */
 .records h3 { font-family: var(--font-mono); font-size: 0.75rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin: 1.4rem 0 0.4rem; }
@@ -271,3 +234,6 @@ a.pcard:hover .pcard-cta span { transform: translateX(4px); }
 .pcard.is-soon { background: transparent; border-style: dashed; }
 .pcard.is-soon .pcard-cta { color: var(--muted); font-weight: 500; }
 @media (prefers-reduced-motion: reduce) { a.pcard:hover { transform: none; } }
+
+/* No divider directly under the projects band */
+.band + .wrap > .section:first-child { border-top: 0; }
