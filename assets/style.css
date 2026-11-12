@@ -198,15 +198,6 @@ td.num { text-align: right; font-variant-numeric: tabular-nums; font-family: var
 .toolkit ul { margin: 0; padding-left: 1.1rem; }
 .toolkit li { margin-bottom: 0.3rem; }
 
-/* About: experience and education list */
-.records h3 { font-family: var(--font-mono); font-size: 0.75rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin: 1.4rem 0 0.4rem; }
-.records h3:first-child { margin-top: 0; }
-.records ul { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); }
-.records li { display: grid; grid-template-columns: 11rem minmax(0, 1fr); gap: 1rem; padding: 0.55rem 0; border-bottom: 1px solid var(--rule); }
-.rec-date { font-family: var(--font-mono); font-size: 0.82rem; color: var(--muted); font-variant-numeric: tabular-nums; padding-top: 0.1rem; }
-.rec-what { min-width: 0; }
-@media (max-width: 560px) { .records li { grid-template-columns: minmax(0, 1fr); gap: 0.1rem; } }
-
 /* Projects section and cards */
 .band { background: var(--band); border-top: 1px solid var(--band-line); border-bottom: 1px solid var(--band-line); padding-block: clamp(2.5rem, 6vw, 4rem); margin-block: 1rem 0.5rem; }
 .band-head { display: grid; gap: 0.5rem; margin-bottom: 2rem; }
