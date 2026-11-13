@@ -1,0 +1,6 @@
+head.bin is derived from the MediaPipe canonical face model
+(https://github.com/google-ai-edge/mediapipe), Copyright The MediaPipe Authors,
+licensed under the Apache License, Version 2.0: https://www.apache.org/licenses/LICENSE-2.0
+The geometry was resampled into points and reshaped.
+
+The drawings (d01-d06) are original works by Christos Katsampas. All rights reserved.

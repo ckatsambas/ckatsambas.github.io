@@ -17,7 +17,7 @@
 <meta property="og:image:alt" content="Christos Katsampas – Personal Project Portfolio">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=5a110bfcd0">
+<link rel="stylesheet" href="assets/style.css?v=09e7d63dc0">
 </head>
 <body>
 <header class="site-head">
@@ -25,6 +25,7 @@
     <a class="brand" href="index.html">HOME</a>
     <nav class="nav" aria-label="Main">
       <a href="index.html#work">Work</a>
+      <a href="index.html#mind">Beyond work</a>
       <a href="index.html#contact">Contact</a>
     </nav>
   </div>
@@ -139,6 +140,120 @@
     </div>
   </section>
 
+</div>
+
+<section class="mind" id="mind" aria-labelledby="mind-title">
+  <div class="mind-stage">
+    <canvas class="mind-canvas" aria-hidden="true"></canvas>
+    <div class="mind-hud">
+      <div class="mind-intro">
+        <p class="mind-kicker">Off the clock</p>
+        <h2 id="mind-title">The part that isn&rsquo;t on the CV</h2>
+        <p class="mind-lede">Seven things that fill the rest of my head. Step inside and pick one to explore.</p>
+        <button class="mind-enter" type="button">Enter my mind <span aria-hidden="true">&rarr;</span></button>
+      </div>
+      <nav class="mind-stars" aria-label="Interests">
+<button class="mind-star" type="button" data-k="draw" style="--i:0"><b>Drawing</b><small>Pencil &amp; charcoal</small></button>
+<button class="mind-star" type="button" data-k="gym" style="--i:1"><b>Gym</b><small>PPL &times; UL</small></button>
+<button class="mind-star" type="button" data-k="run" style="--i:2"><b>Running</b><small>10 km is home</small></button>
+<button class="mind-star" type="button" data-k="research" style="--i:3"><b>Research</b><small>People &amp; society</small></button>
+<button class="mind-star" type="button" data-k="gaming" style="--i:4"><b>Gaming</b><small>CS &middot; COD &middot; Souls</small></button>
+<button class="mind-star" type="button" data-k="read" style="--i:5"><b>Reading</b><small>Classics &amp; Stoics</small></button>
+<button class="mind-star" type="button" data-k="music" style="--i:6"><b>Music</b><small>Rock &amp; jazz</small></button>
+      </nav>
+      <div class="mind-tools">
+        <button class="mind-back" type="button" hidden><span aria-hidden="true">&larr;</span> Back to the face</button>
+        <p class="mind-hint" hidden>Drag to rotate &middot; select a star</p>
+      </div>
+    </div>
+    <aside class="mind-panel" aria-live="polite" hidden>
+      <button class="mind-close" type="button" aria-label="Close">&times;</button>
+      <div class="mind-panel-body"></div>
+    </aside>
+  </div>
+
+  <template data-k="draw">
+    <p class="mp-kicker">01 &middot; Drawing</p>
+    <h3 tabindex="-1">Pencil &amp; charcoal</h3>
+    <p>Mostly surreal scenes and faces. Each piece is traced in light first; then the original shows through.</p>
+    <div class="sketch"><canvas class="sketch-canvas" aria-label="Drawing" role="img"></canvas></div>
+    <div class="sketch-nav">
+      <button type="button" class="sk-prev" aria-label="Previous drawing">&larr;</button>
+      <span class="sk-count">01 / 06</span>
+      <button type="button" class="sk-next" aria-label="Next drawing">&rarr;</button>
+      <button type="button" class="sk-replay">Trace again</button>
+    </div>
+  </template>
+
+  <template data-k="gym">
+    <p class="mp-kicker">02 &middot; Gym</p>
+    <h3 tabindex="-1">PPL &times; Upper/Lower</h3>
+    <p>A hybrid split: push, pull and legs, then upper and lower. These are the lifts I enjoy most and my best on each.</p>
+    <ul class="prs">
+<li><span class="pr-name">Leg press</span><span class="pr-bar"><i style="--w:1.000"></i></span><span class="pr-kg"><b data-count="300">300</b> kg</span></li>
+<li><span class="pr-name">Chest press</span><span class="pr-bar"><i style="--w:0.367"></i></span><span class="pr-kg"><b data-count="110">110</b> kg</span></li>
+<li><span class="pr-name">Back extension (weighted)</span><span class="pr-bar"><i style="--w:0.267"></i></span><span class="pr-kg"><b data-count="80">80</b> kg</span></li>
+<li><span class="pr-name">T-bar row</span><span class="pr-bar"><i style="--w:0.200"></i></span><span class="pr-kg"><b data-count="60">60</b> kg</span></li>
+    </ul>
+  </template>
+
+  <template data-k="run">
+    <p class="mp-kicker">03 &middot; Running</p>
+    <h3 tabindex="-1">The 10 km race is my favourite</h3>
+    <div class="run-grid">
+      <div><b>22:43</b><span>Best 5 km &middot; 4:33/km</span></div>
+      <div><b>48:37</b><span>Best 10 km race &middot; 4:52/km</span></div>
+      <div><b>26 km</b><span>Longest run</span></div>
+      <div><b>21.1 km</b><span>Longest race &middot; half marathon</span></div>
+    </div>
+    <div class="run-line" aria-hidden="true">
+      <i class="rl-track"></i><i class="rl-dot"></i>
+      <span style="--x:.192">5</span><span style="--x:.385">10</span><span style="--x:.812">21.1</span><span style="--x:1">26 km</span>
+    </div>
+    <p class="mp-note">Usually 10&ndash;25 km a month.</p>
+  </template>
+
+  <template data-k="research">
+    <p class="mp-kicker">04 &middot; Research</p>
+    <h3 tabindex="-1">How people and societies behave</h3>
+    <blockquote>Anything and everything surrounding human behaviour and the complexity of society.</blockquote>
+    <div class="flock"><canvas class="flock-canvas" aria-label="Flocking simulation" role="img"></canvas></div>
+    <p class="mp-note">A tiny crowd model: each dot only follows its neighbours, yet a group pattern appears. Move your pointer through it.</p>
+  </template>
+
+  <template data-k="gaming">
+    <p class="mp-kicker">05 &middot; Gaming</p>
+    <h3 tabindex="-1">Where I unwind</h3>
+    <ul class="games">
+      <li><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="13" fill="none" stroke="currentColor" stroke-width="2"/><path d="M24 4v12M24 32v12M4 24h12M32 24h12" stroke="currentColor" stroke-width="2"/><circle cx="24" cy="24" r="2" fill="currentColor"/></svg><b>Counter-Strike: Global Offensive</b><span>Tactical shooter</span></li>
+      <li><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 30h22l4-6h6v-4H22l-3-4H8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M14 30l-2 8h6l2-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><b>Call of Duty</b><span>First-person shooter</span></li>
+      <li><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 6c2 7 9 10 9 19a9 9 0 0 1-18 0c0-5 3-7 4-11 1 3 2 4 4 5-1-5 0-9 1-13z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 42l24-6M36 42L12 36" stroke="currentColor" stroke-width="2"/></svg><b>Dark Souls</b><span>Action RPG</span></li>
+    </ul>
+  </template>
+
+  <template data-k="read">
+    <p class="mp-kicker">06 &middot; Reading</p>
+    <h3 tabindex="-1">On the desk, and on the shelf</h3>
+    <p class="shelf-label">Reading now</p>
+    <ul class="shelf"><li class="spine s0"><span>The Prince</span><small>Niccol&ograve; Machiavelli</small></li><li class="spine s1"><span>Meditations</span><small>Marcus Aurelius</small></li></ul>
+    <p class="shelf-label">Favourites</p>
+    <ul class="shelf"><li class="spine s2"><span>Great Expectations</span><small>Charles Dickens</small></li><li class="spine s3"><span>The Picture of Dorian Gray</span><small>Oscar Wilde</small></li><li class="spine s4"><span>Psycho-Pass</span><small>Manga</small></li><li class="spine s5"><span>Siddhartha</span><small>Hermann Hesse</small></li><li class="spine s6"><span>The Bible</span></li></ul>
+  </template>
+
+  <template data-k="music">
+    <p class="mp-kicker">07 &middot; Music</p>
+    <h3 tabindex="-1">Rock &amp; jazz</h3>
+    <ul class="bands"><li>Pink Floyd</li><li>Radiohead</li><li>Mazzy Star</li></ul>
+    <p class="shelf-label">Favourite song</p>
+    <div class="song">
+      <p><b>Iris</b> &middot; The Goo Goo Dolls</p>
+      <button type="button" class="song-load">Play it here <small>(loads Spotify&rsquo;s player)</small></button>
+    </div>
+    <a class="spotify-link" href="https://open.spotify.com/user/bo5uffshhjt8mot727a4kmns6" target="_blank" rel="noopener">My Spotify profile <span aria-hidden="true">&nearr;</span></a>
+  </template>
+</section>
+
+<div class="wrap">
   <section class="section" id="contact">
     <div class="section-head"><h2>Contact</h2><p>For permission to use any material, or for an editable copy, write to me.</p></div>
     <div class="contact-line">
@@ -154,5 +269,6 @@
     <p><a href="LICENSE.txt">Licence</a> &middot; <a href="index.html">All projects</a></p>
   </div>
 </footer>
+<script src="assets/about/mind.js?v=92287d43d1" defer></script>
 </body>
 </html>
