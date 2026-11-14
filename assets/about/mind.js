@@ -278,7 +278,7 @@
   function build(buf) {
     var total = new Uint32Array(buf, 0, 1)[0];
     var mobile = Math.min(window.innerWidth, window.innerHeight) < 700;
-    var N = Math.min(total, mobile ? 5200 : 9000);
+    var N = Math.min(total, mobile ? 5200 : 10000);
     var P = new Int16Array(buf, 4, total * 3), Wt = new Uint8Array(buf, 4 + total * 6, total);
     var face = new Float32Array(N * 3), gal = new Float32Array(N * 3), col = new Float32Array(N * 3),
         R = new Float32Array(N * 4), W = new Float32Array(N * 2), r = rnd(42);
