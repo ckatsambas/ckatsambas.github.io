@@ -62,8 +62,9 @@
     gym: function (el) {
       el.querySelectorAll("[data-count]").forEach(function (n) { countUp(n, +n.dataset.count, 900); });
       requestAnimationFrame(function () { el.querySelector(".prs").classList.add("is-in"); });
+      return window.MindHolo ? window.MindHolo.gym(el.querySelector(".holo")) : null;
     },
-    run: function (el) { requestAnimationFrame(function () { el.querySelector(".run-line").classList.add("is-in"); }); },
+    run: function (el) { return window.MindHolo ? window.MindHolo.run(el.querySelector(".holo")) : null; },
     research: flockPanel,
     music: function (el) {
       var btn = el.querySelector(".song-load");

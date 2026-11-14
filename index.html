@@ -17,7 +17,7 @@
 <meta property="og:image:alt" content="Christos Katsampas – Personal Project Portfolio">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=09e7d63dc0">
+<link rel="stylesheet" href="assets/style.css?v=c9b6b2c9f0">
 </head>
 <body>
 <header class="site-head">
@@ -188,7 +188,9 @@
   <template data-k="gym">
     <p class="mp-kicker">02 &middot; Gym</p>
     <h3 tabindex="-1">PPL &times; Upper/Lower</h3>
-    <p>A hybrid split: push, pull and legs, then upper and lower. These are the lifts I enjoy most and my best on each.</p>
+    <p>A hybrid split: push, pull and legs, then upper and lower.</p>
+    <div class="holo-wrap"><div class="holo"></div><span class="holo-tag holo-rep">Rep 1 / 12</span></div>
+    <p class="shelf-label">Personal bests</p>
     <ul class="prs">
 <li><span class="pr-name">Leg press</span><span class="pr-bar"><i style="--w:1.000"></i></span><span class="pr-kg"><b data-count="300">300</b> kg</span></li>
 <li><span class="pr-name">Chest press</span><span class="pr-bar"><i style="--w:0.367"></i></span><span class="pr-kg"><b data-count="110">110</b> kg</span></li>
@@ -200,15 +202,12 @@
   <template data-k="run">
     <p class="mp-kicker">03 &middot; Running</p>
     <h3 tabindex="-1">The 10 km race is my favourite</h3>
+    <div class="holo-wrap"><div class="holo"></div><span class="holo-tag holo-cue"></span><span class="holo-tag holo-clock">0.00 s</span></div>
     <div class="run-grid">
       <div><b>22:43</b><span>Best 5 km &middot; 4:33/km</span></div>
       <div><b>48:37</b><span>Best 10 km race &middot; 4:52/km</span></div>
       <div><b>26 km</b><span>Longest run</span></div>
       <div><b>21.1 km</b><span>Longest race &middot; half marathon</span></div>
-    </div>
-    <div class="run-line" aria-hidden="true">
-      <i class="rl-track"></i><i class="rl-dot"></i>
-      <span style="--x:.192">5</span><span style="--x:.385">10</span><span style="--x:.812">21.1</span><span style="--x:1">26 km</span>
     </div>
     <p class="mp-note">Usually 10&ndash;25 km a month.</p>
   </template>
@@ -244,9 +243,20 @@
     <p class="mp-kicker">07 &middot; Music</p>
     <h3 tabindex="-1">Rock &amp; jazz</h3>
     <ul class="bands"><li>Pink Floyd</li><li>Radiohead</li><li>Mazzy Star</li></ul>
-    <p class="shelf-label">Favourite song</p>
+    <p class="shelf-label">Most played, all time</p>
+    <ol class="top-songs">
+<li style="--w:1.000;--i:0"><span class="ts-rank">01</span><a class="ts-song" href="https://open.spotify.com/search/Iris%20The%20Goo%20Goo%20Dolls" target="_blank" rel="noopener"><b>Iris</b><small>The Goo Goo Dolls</small></a><span class="ts-n"><b>360</b> plays</span><i class="ts-bar"></i></li>
+<li style="--w:0.831;--i:1"><span class="ts-rank">02</span><a class="ts-song" href="https://open.spotify.com/search/K.%20Cigarettes%20After%20Sex" target="_blank" rel="noopener"><b>K.</b><small>Cigarettes After Sex</small></a><span class="ts-n"><b>299</b> plays</span><i class="ts-bar"></i></li>
+<li style="--w:0.789;--i:2"><span class="ts-rank">03</span><a class="ts-song" href="https://open.spotify.com/search/My%20Kind%20of%20Woman%20Mac%20DeMarco" target="_blank" rel="noopener"><b>My Kind of Woman</b><small>Mac DeMarco</small></a><span class="ts-n"><b>284</b> plays</span><i class="ts-bar"></i></li>
+<li style="--w:0.728;--i:3"><span class="ts-rank">04</span><a class="ts-song" href="https://open.spotify.com/search/Jigsaw%20Falling%20Into%20Place%20Radiohead" target="_blank" rel="noopener"><b>Jigsaw Falling Into Place</b><small>Radiohead</small></a><span class="ts-n"><b>262</b> plays</span><i class="ts-bar"></i></li>
+<li style="--w:0.683;--i:4"><span class="ts-rank">05</span><a class="ts-song" href="https://open.spotify.com/search/Coming%20Back%20to%20You%20Leonard%20Cohen" target="_blank" rel="noopener"><b>Coming Back to You</b><small>Leonard Cohen</small></a><span class="ts-n"><b>246</b> plays</span><i class="ts-bar"></i></li>
+<li style="--w:0.678;--i:5"><span class="ts-rank">06</span><a class="ts-song" href="https://open.spotify.com/search/Inner%20Light%20Shocking%20Lemon" target="_blank" rel="noopener"><b>Inner Light</b><small>Shocking Lemon</small></a><span class="ts-n"><b>244</b> plays</span><i class="ts-bar"></i></li>
+<li style="--w:0.628;--i:6"><span class="ts-rank">07</span><a class="ts-song" href="https://open.spotify.com/search/Linger%20The%20Cranberries" target="_blank" rel="noopener"><b>Linger</b><small>The Cranberries</small></a><span class="ts-n"><b>226</b> plays</span><i class="ts-bar"></i></li>
+<li style="--w:0.583;--i:7"><span class="ts-rank">08</span><a class="ts-song" href="https://open.spotify.com/search/Time%20After%20Time%20Cyndi%20Lauper" target="_blank" rel="noopener"><b>Time After Time</b><small>Cyndi Lauper</small></a><span class="ts-n"><b>210</b> plays</span><i class="ts-bar"></i></li>
+<li style="--w:0.564;--i:8"><span class="ts-rank">09</span><a class="ts-song" href="https://open.spotify.com/search/Shake%20Me%20Down%20Cage%20The%20Elephant" target="_blank" rel="noopener"><b>Shake Me Down</b><small>Cage The Elephant</small></a><span class="ts-n"><b>203</b> plays</span><i class="ts-bar"></i></li>
+    </ol>
     <div class="song">
-      <p><b>Iris</b> &middot; The Goo Goo Dolls</p>
+      <p><b>Iris</b> &middot; my number one</p>
       <button type="button" class="song-load">Play it here <small>(loads Spotify&rsquo;s player)</small></button>
     </div>
     <a class="spotify-link" href="https://open.spotify.com/user/bo5uffshhjt8mot727a4kmns6" target="_blank" rel="noopener">My Spotify profile <span aria-hidden="true">&nearr;</span></a>
@@ -269,6 +279,7 @@
     <p><a href="LICENSE.txt">Licence</a> &middot; <a href="index.html">All projects</a></p>
   </div>
 </footer>
-<script src="assets/about/mind.js?v=92287d43d1" defer></script>
+<script src="assets/about/holo.js?v=4f02d282f0" defer></script>
+<script src="assets/about/mind.js?v=34e68c8caa" defer></script>
 </body>
 </html>
