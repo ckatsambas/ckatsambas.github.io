@@ -143,6 +143,11 @@
     run: function (el) { return window.MindHolo ? window.MindHolo.run(el.querySelector(".holo")) : null; },
     research: flockPanel,
     read: function (el) {
+      // A cover or poster that fails to load falls back to the plain text card underneath.
+      el.querySelectorAll(".book img, .filmstrip img").forEach(function (im) {
+        function drop() { im.parentNode.classList.remove("has-cover"); im.parentNode.classList.add("no-img"); im.remove(); }
+        if (im.complete && !im.naturalWidth) drop(); else im.addEventListener("error", drop);
+      });
       var tabs = el.querySelectorAll("[data-tab]");
       tabs.forEach(function (t) {
         t.addEventListener("click", function () {
