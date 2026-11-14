@@ -55,7 +55,11 @@
     });
   });
   root.querySelector(".mind-close").addEventListener("click", closePanel);
-  root.addEventListener("keydown", function (e) { if (e.key === "Escape") closePanel(); });
+  root.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape") return;
+    if (!panel.hidden) closePanel(); else if (root.classList.contains("mind--immersive") && exitMind) exitMind();
+  });
+  var exitMind = null;
 
   var PANELS = {
     draw: drawPanel,
@@ -358,8 +362,72 @@
   }
   function galRot() { return mul(rotX(S.pitch), rotY(S.yaw)); }
 
+  /* ---------- immersive mode: the stage grows from its place on the page to fill the window ---------- */
+  var fsBtn = root.querySelector(".mind-fs"), immersive = false, animMs = reduced ? 0 : 650;
+  function insetOf(r) {
+    return "inset(" + Math.max(0, r.top) + "px " + Math.max(0, window.innerWidth - r.right) + "px " +
+      Math.max(0, window.innerHeight - r.bottom) + "px " + Math.max(0, r.left) + "px round 0px)";
+  }
+  function lockScroll(on) {
+    var de = document.documentElement;
+    if (on) {
+      var sb = window.innerWidth - de.clientWidth;
+      de.style.overflow = "hidden"; if (sb > 0) de.style.paddingRight = sb + "px";
+    } else { de.style.overflow = ""; de.style.paddingRight = ""; }
+  }
+  function goImmersive() {
+    if (immersive) return;
+    immersive = true;
+    var r = stage.getBoundingClientRect();
+    root.style.height = root.offsetHeight + "px";           // keep the page from jumping underneath
+    lockScroll(true);
+    stage.style.transition = "none";
+    stage.style.clipPath = insetOf(r);
+    root.classList.add("mind--immersive");
+    resize();
+    void stage.offsetWidth;
+    stage.style.transition = "clip-path " + animMs + "ms cubic-bezier(.7,0,.2,1)";
+    stage.style.clipPath = "inset(0px 0px 0px 0px round 0px)";
+    try { if (!history.state || !history.state.mind) history.pushState({ mind: 1 }, ""); } catch (e) {}
+    if (fsBtn) fsBtn.hidden = !(document.fullscreenEnabled && window.matchMedia("(pointer: fine)").matches);
+  }
+  function leaveImmersive() {
+    if (!immersive) return;
+    immersive = false;
+    if (document.fullscreenElement) document.exitFullscreen().catch(function () {});
+    if (fsBtn) fsBtn.hidden = true;
+    var target = root.getBoundingClientRect();
+    stage.style.transition = "clip-path " + animMs + "ms cubic-bezier(.7,0,.2,1)";
+    stage.style.clipPath = insetOf(target);
+    setTimeout(function () {
+      if (immersive) return;
+      stage.style.transition = ""; stage.style.clipPath = "";
+      root.classList.remove("mind--immersive");
+      root.style.height = "";
+      lockScroll(false);
+      resize();
+    }, animMs);
+  }
+  if (fsBtn) fsBtn.addEventListener("click", function () {
+    if (document.fullscreenElement) document.exitFullscreen().catch(function () {});
+    else stage.requestFullscreen().catch(function () {});
+  });
+  document.addEventListener("fullscreenchange", function () {
+    if (fsBtn) fsBtn.classList.toggle("is-on", !!document.fullscreenElement);
+    setTimeout(resize, 50);
+  });
+  // The phone's back gesture leaves the galaxy instead of the page.
+  window.addEventListener("popstate", function () { if (immersive) leave(true); });
+  exitMind = function () { requestLeave(); };
+  function requestLeave() {
+    var ours = false;
+    try { ours = !!(history.state && history.state.mind); } catch (e) {}
+    if (ours) history.back(); else leave(true);
+  }
+
   function enter() {
     if (S.mode === "galaxy") return;
+    goImmersive();
     S.mode = "galaxy"; S.pT = 1; S.yawT = null;
     root.classList.add("mind--galaxy");
     backBtn.hidden = false; hint.hidden = false;
@@ -368,6 +436,7 @@
   }
   function leave() {
     closePanel();
+    leaveImmersive();
     S.mode = "face"; S.pT = 0;
     root.classList.remove("mind--galaxy");
     backBtn.hidden = true; hint.hidden = true;
@@ -389,7 +458,7 @@
     }
   };
   enterBtn.addEventListener("click", enter);
-  backBtn.addEventListener("click", leave);
+  backBtn.addEventListener("click", requestLeave);
 
   canvas.addEventListener("pointerdown", function (e) {
     dragging = true; moved = 0; lx = e.clientX; ly = e.clientY;

@@ -386,3 +386,21 @@ a.pcard:hover .pcard-cta span { transform: translateX(4px); }
   transform: scaleX(var(--w)); animation: ts-in .9s cubic-bezier(.2, .8, .2, 1) both; animation-delay: calc(var(--i) * 60ms); }
 @keyframes ts-in { from { transform: scaleX(0); } }
 @media (prefers-reduced-motion: reduce) { .ts-bar { animation: none; } }
+
+/* Immersive mode: the galaxy takes over the window */
+.mind--immersive .mind-stage {
+  position: fixed; inset: 0; z-index: 1000; width: 100vw; height: 100vh; height: 100dvh; min-height: 0;
+  border: 0; will-change: clip-path;
+}
+.mind-stage:fullscreen { width: 100vw; height: 100vh; }
+.mind--immersive .mind-tools { top: max(1rem, env(safe-area-inset-top)); }
+.mind-fs {
+  position: absolute; right: 1rem; bottom: 1rem; width: 2.5rem; height: 2.5rem; border-radius: 50%;
+  background: rgba(3, 7, 12, 0.5); border: 1px solid var(--m-line); display: grid; place-items: center; color: var(--m-ink);
+}
+.mind-fs:hover { border-color: var(--m-glow); }
+.mind-fs svg { width: 1.1rem; height: 1.1rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.mind-fs .fs-out, .mind-fs.is-on .fs-in { display: none; }
+.mind-fs.is-on .fs-out { display: inline; }
+.mind--panel .mind-fs { right: calc(min(27rem, 100% - 32px) + max(16px, (100% - var(--wrap)) / 2 + 16px) + 1rem); }
+@media (max-width: 760px) { .mind-fs { display: none; } }
