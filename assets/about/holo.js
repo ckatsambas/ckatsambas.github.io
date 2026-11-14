@@ -183,13 +183,14 @@
       if (opts.floor) opts.floor(ctx, function (x, y, z) { return project(cam, x, y, z); }, t, st);
       var scan = 2.1 - ((t * 0.5) % 1) * 2.6, glitchY = st.glitch ? (Math.sin(t * 13) * 0.5 + 1) : -9;
       var body3 = opts.color, acc = opts.accent;
+      var fade = st.alpha == null ? 1 : st.alpha;
       for (var j = 0; j < body.n; j++) {
         var X2 = buf[j * 3], Y3 = buf[j * 3 + 1] + lift, Z3 = buf[j * 3 + 2] + shiftZ;
         if (Math.abs(Y3 - glitchY) < 0.04) X2 += 0.05;
         var q = project(cam, X2, Y3, Z3); if (!q) continue;
         var band = Math.exp(-Math.pow((Y3 - scan) * 7, 2));
         var depth = Math.max(0.35, Math.min(1, 1.6 - q[2] / opts.dist));
-        var a = (body.k[j] === 1 ? 0.6 : 0.4) * depth * (1 + band * 1.6);
+        var a = (body.k[j] === 1 ? 0.6 : 0.4) * depth * (1 + band * 1.6) * fade;
         var col = body.k[j] === 2 ? acc : body3;
         ctx.fillStyle = "rgba(" + col + "," + Math.min(1, a).toFixed(2) + ")";
         var sz = body.k[j] === 1 ? 1.5 : 1.25;
@@ -248,81 +249,111 @@
     });
   }
 
-  /* ---------- Running: sprint start, then a steady run ---------- */
+  /* ---------- Running: sprint start, sprint, slow down, forward roll, sit ---------- */
   var MARKS = { pitch: 68, lean: 0, neck: -18, shL: 66, shR: 66, abdL: 8, abdR: 8, elL: 0, elR: 0, wrL: -70, wrR: -70,
                 hipL: 138, kneeL: 122, ankL: -25, hipR: 72, kneeR: 108, ankR: 10 };
   var SET = { pitch: 98, lean: 0, neck: -22, shL: 98, shR: 98, abdL: 8, abdR: 8, elL: 0, elR: 0, wrL: -80, wrR: -80,
               hipL: 148, kneeL: 92, ankL: -10, hipR: 84, kneeR: 58, ankR: -15 };
-  function gait(ph, lean, amp) {
-    // World-referenced joint angles, then made relative to the leaning pelvis.
+  var TUCK = { lean: 28, neck: 35, twist: 0, hipL: 128, hipR: 128, kneeL: 140, kneeR: 140, ankL: 20, ankR: 20,
+               shL: 75, shR: 75, elL: 95, elR: 95, abdL: 12, abdR: 12, wrL: 0, wrR: 0 };
+  var SEAT = { pitch: 345, lean: 6, neck: -6, twist: 0, hipL: 76, hipR: 72, kneeL: 14, kneeR: 34, ankL: 18, ankR: 10,
+               shL: -52, shR: -52, elL: 4, elR: 4, abdL: 16, abdR: 16, wrL: -60, wrR: -60 };
+  function sprint(ph, lean, amp) {
+    // Angles are thought of against the vertical, then made relative to the leaning pelvis.
     function leg(t) {
-      var hip = 15 + 50 * amp * Math.sin(6.2832 * t);
-      var knee = 18 + 100 * amp * Math.pow(Math.max(0, Math.cos(6.2832 * (t - 0.03))), 1.4);
-      var ank = -25 * Math.max(0, Math.sin(6.2832 * (t - 0.55)));
+      var s = Math.sin(6.2832 * t);
+      var hip = 22 + 58 * amp * s;                                           // high knee drive
+      var knee = 16 + 128 * amp * Math.pow(Math.max(0, Math.cos(6.2832 * (t - 0.06))), 1.15); // heel to glute
+      var ank = 22 * Math.max(0, Math.cos(6.2832 * t)) - 32 * Math.max(0, Math.sin(6.2832 * (t - 0.6)));
       return [hip + lean, knee, ank];
     }
     var L = leg(ph), R = leg(ph + 0.5);
-    var arm = function (t) { return -42 * amp * Math.sin(6.2832 * t) + 8 + lean; };
+    function arm(t) { return -62 * amp * Math.sin(6.2832 * t) + 12 + lean; }
     return {
-      pitch: lean, lean: 0, neck: -lean * 0.6, twist: 7 * Math.sin(6.2832 * ph), turn: 0,
+      pitch: lean, lean: 0, neck: -lean * 0.7, twist: 9 * amp * Math.sin(6.2832 * ph), turn: 0,
       hipL: L[0], kneeL: L[1], ankL: L[2], hipR: R[0], kneeR: R[1], ankR: R[2],
-      shL: arm(ph + 0.5), shR: arm(ph), elL: 88 + 10 * Math.sin(6.2832 * ph), elR: 88 - 10 * Math.sin(6.2832 * ph),
-      abdL: 10, abdR: 10, wrL: 0, wrR: 0
+      shL: arm(ph + 0.5), shR: arm(ph),
+      elL: 90 - 22 * amp * Math.sin(6.2832 * (ph + 0.5)), elR: 90 - 22 * amp * Math.sin(6.2832 * ph),
+      abdL: 9, abdR: 9, wrL: 0, wrR: 0
     };
   }
+  // Timeline in seconds.
+  var T = { set: 1.0, go: 2.0, top: 3.3, slow: 5.0, roll: 6.1, rolled: 7.0, seat: 7.5, fade: 9.8, loop: 10.4 };
   function run(el) {
-    var cue = el.parentNode.querySelector(".holo-cue"), clock = el.parentNode.querySelector(".holo-clock");
-    var LOOP = 10.5, GO = 2.6, phase = 0, lastT = 0, dist = 0;
+    var cue = el.parentNode.querySelector(".holo-cue");
+    var phase = 0, lastT = 0, dist = 0;
     function state(t) {
-      var lt = t % LOOP, dt = Math.max(0, Math.min(0.05, lt - lastT)); lastT = lt;
+      var lt = t % T.loop, dt = Math.max(0, Math.min(0.05, lt - lastT)); lastT = lt;
       if (lt < 0.05) { phase = 0; dist = 0; }
-      var pose, speed = 0, label = "", glitch = lt > LOOP - 0.35 || lt < 0.15;
-      if (lt < 1.2) { pose = MARKS; label = "On your marks"; }
-      else if (lt < GO) { pose = lerpPose(MARKS, SET, ease((lt - 1.2) / 0.5)); label = "Set"; }
-      else {
-        var g = lt - GO;
-        var cad = lerp(2.2, 1.45, ease(g / 2.2));          // drive phase: quick, short steps
+      var pose, speed = 0, label = "", lift = 0, alpha = 1;
+      if (lt < T.set) { pose = MARKS; label = "On your marks"; }
+      else if (lt < T.go) { pose = lerpPose(MARKS, SET, ease((lt - T.set) / 0.45)); label = "Set"; }
+      else if (lt < T.roll) {
+        var g = lt - T.go, cad, lean, amp;
+        if (lt < T.slow) {
+          cad = lerp(2.9, 2.35, ease(g / 1.4));            // drive phase: rapid, low steps
+          lean = lerp(50, 12, ease(g / 1.5));
+          amp = lerp(0.78, 1, ease(g / 1.1));
+          speed = lerp(3, 10.5, ease(g / 1.6));
+        } else {
+          var d = ease((lt - T.slow) / (T.roll - T.slow));   // ease off: upright, shorter strides
+          cad = lerp(2.35, 1.5, d); lean = lerp(12, 2, d); amp = lerp(1, 0.55, d); speed = lerp(10.5, 3.2, d);
+        }
         phase += dt * cad;
-        var lean = lerp(48, 9, ease(g / 2.4)), amp = lerp(0.75, 1, ease(g / 1.5));
-        pose = lerpPose(SET, gait(phase, lean, amp), ease(g / 0.35));
-        speed = lerp(1.5, 7.5, ease(g / 2.5));
-        label = g < 0.8 ? "Go" : "";
+        var p = sprint(phase, lean, amp);
+        // Flight phase: both feet leave the ground between steps.
+        lift = 0.07 * amp * Math.max(0, Math.sin(6.2832 * 2 * phase + 0.8));
+        pose = lt - T.go < 0.3 ? lerpPose(SET, p, ease((lt - T.go) / 0.3)) : p;
+        label = g < 0.7 ? "Go!" : "";
+        if (lt > T.roll - 0.3) {                             // gather into a crouch
+          var c = ease((lt - (T.roll - 0.3)) / 0.3);
+          pose = lerpPose(pose, lerpPose(TUCK, { pitch: 55 }, 1), c);
+        }
+      } else if (lt < T.rolled) {
+        var r = ease((lt - T.roll) / (T.rolled - T.roll));
+        pose = lerpPose(TUCK, { pitch: lerp(55, 345, r) }, 1);
+        speed = lerp(3, 0.4, r);
+      } else if (lt < T.seat) {
+        pose = lerpPose(lerpPose(TUCK, { pitch: 345 }, 1), SEAT, ease((lt - T.rolled) / (T.seat - T.rolled)));
+        speed = lerp(0.4, 0, ease((lt - T.rolled) / 0.3));
+      } else {
+        var b = Math.sin((lt - T.seat) * 2.4);
+        pose = lerpPose(SEAT, { lean: 6 + b * 1.5, neck: -6 - b }, 1);
+        if (lt > T.fade) alpha = 1 - ease((lt - T.fade) / (T.loop - T.fade));
       }
+      if (lt < 0.3) alpha = ease(lt / 0.3);
       dist += speed * dt;
-      return { pose: pose, speed: speed, dist: dist, label: label, glitch: glitch, lt: lt };
+      return { pose: pose, dist: dist, label: label, lift: lift, alpha: alpha, glitch: lt > T.fade };
     }
     return Stage(el, {
-      label: "Hologram of a sprinter starting from a crouch and running",
-      yaw: -1.25, pitch: 0.12, cy: 0.75, dist: 3.9, f: 1.2, ratio: 0.72, ox: -0.04, color: "143,220,255", accent: "124,240,176",
+      label: "Hologram of a sprinter: start from the blocks, sprint, slow down, forward roll and sit",
+      yaw: -1.42, pitch: 0.1, cy: 0.7, dist: 4.2, f: 1.2, ratio: 0.66, color: "143,220,255", accent: "124,240,176",
       update: function (t, reduced) {
-        var s = reduced ? { pose: gait(0.2, 9, 1), speed: 0, dist: 0, label: "", glitch: false, lt: 6 } : state(t);
+        var s = reduced ? { pose: sprint(0.15, 12, 1), dist: 0, label: "", lift: 0, alpha: 1 } : state(t);
         if (cue) { cue.textContent = s.label; cue.classList.toggle("is-on", !!s.label); }
-        if (clock) clock.textContent = s.lt > GO ? (s.lt - GO).toFixed(2) + " s" : "0.00 s";
         return s;
       },
       floor: function (ctx, P, t, s) {
-        // Track: lane lines and distance marks that scroll past.
-        var lanes = [-1.83, -0.61, 0.61, 1.83], off = (s.dist || 0) % 1;
+        var dz = s.dist || 0, a0 = s.alpha == null ? 1 : s.alpha;
+        function dot(x, z, a, w) {
+          var q = P(x, 0, z); if (!q) return;
+          ctx.fillStyle = "rgba(124,240,176," + (a * a0 * Math.max(0, 1 - Math.abs(z) / 6)).toFixed(2) + ")";
+          ctx.fillRect(q[0] - w / 2, q[1] - w / 2, w, w);
+        }
+        var lanes = [-1.83, -0.61, 0.61, 1.83];
         for (var li = 0; li < lanes.length; li++) {
-          for (var z = -6; z < 6; z += 0.12) {
-            var q = P(lanes[li], 0, z - off * 0 - ((s.dist || 0) % 0.12));
-            if (!q) continue;
-            ctx.fillStyle = "rgba(124,240,176," + (0.32 * Math.max(0, 1 - Math.abs(z) / 6)).toFixed(2) + ")";
-            ctx.fillRect(q[0] - 0.7, q[1] - 0.7, 1.4, 1.4);
-          }
+          for (var z = -6; z < 6; z += 0.1) dot(lanes[li], z, 0.22, 1.2);           // lane line (static)
+          var o = dz % 1;
+          for (var m = -6; m < 7; m++) dot(lanes[li], m - o, 0.8, 2.6);            // metre ticks scroll past
         }
-        // Start line, left behind once the runner goes.
-        var sz = 0.55 - (s.dist || 0);
-        if (sz > -6) for (var x = -1.83; x <= 1.83; x += 0.05) {
+        for (var k = 1; k < 30; k++) {                                              // 10 m marks
+          var zz = k * 10 - dz + 0.55; if (zz < -6 || zz > 6) continue;
+          for (var x2 = -0.61; x2 <= 0.61; x2 += 0.05) dot(x2, zz, 0.45, 1.4);
+        }
+        var sz = 0.55 - dz;                                                         // start line
+        if (sz > -6) for (var x = -1.83; x <= 1.83; x += 0.04) {
           var q2 = P(x, 0, sz); if (!q2) continue;
-          ctx.fillStyle = "rgba(255,255,255,0.5)"; ctx.fillRect(q2[0] - 0.8, q2[1] - 0.8, 1.6, 1.6);
-        }
-        for (var m = 1; m < 12; m++) {
-          var zz = m * 5 - (s.dist || 0) + 0.55; if (zz < -6 || zz > 6) continue;
-          for (var x2 = -0.61; x2 <= 0.61; x2 += 0.06) {
-            var q3 = P(x2, 0, zz); if (!q3) continue;
-            ctx.fillStyle = "rgba(124,240,176,0.35)"; ctx.fillRect(q3[0] - 0.7, q3[1] - 0.7, 1.4, 1.4);
-          }
+          ctx.fillStyle = "rgba(255,255,255," + (0.55 * a0) + ")"; ctx.fillRect(q2[0] - 0.8, q2[1] - 0.8, 1.6, 1.6);
         }
       }
     });
