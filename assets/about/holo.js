@@ -142,8 +142,8 @@
     var body = sampleBody(opts.points || 3400, rnd(11), opts.extra);
     var buf = new Float32Array(body.n * 3);
     function size() {
-      var w = el.clientWidth;
-      W = w; H = Math.round(w * (opts.ratio || 0.8));
+      var w = el.clientWidth, h = el.clientHeight;
+      W = w; H = h > 120 ? h : Math.round(w * (opts.ratio || 0.8));
       dpr = Math.min(window.devicePixelRatio || 1, 2);
       cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + "px"; cv.style.height = H + "px";
     }
@@ -202,8 +202,9 @@
     }
     raf = requestAnimationFrame(frame);
     var onResize = function () { size(); if (reduced) requestAnimationFrame(frame); };
-    window.addEventListener("resize", onResize);
-    return function () { alive = false; cancelAnimationFrame(raf); window.removeEventListener("resize", onResize); };
+    var ro = window.ResizeObserver ? new ResizeObserver(onResize) : null;
+    if (ro) ro.observe(el); else window.addEventListener("resize", onResize);
+    return function () { alive = false; cancelAnimationFrame(raf); if (ro) ro.disconnect(); else window.removeEventListener("resize", onResize); };
   }
 
   /* ---------- Gym: alternating dumbbell curls ---------- */

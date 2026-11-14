@@ -17,27 +17,72 @@
   var COLORS = [[0.95, 0.93, 0.88], [1.0, 0.55, 0.38], [0.49, 0.94, 0.69], [0.56, 0.86, 1.0],
                 [0.77, 0.61, 1.0], [1.0, 0.82, 0.48], [1.0, 0.48, 0.78]];
   var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var panelCleanup = null;
+  var panelCleanup = null, swapToken = 0;
+  var NAMES = stars.map(function (b) { return b.querySelector("b").textContent; });
+  var swPrev = root.querySelector(".msw-prev"), swNext = root.querySelector(".msw-next"), swCount = root.querySelector(".msw-count");
 
   /* ---------- panels (shared by the 3D and the static version) ---------- */
-  function openPanel(k) {
+  function fillPanel(k) {
     var tpl = root.querySelector('template[data-k="' + k + '"]');
-    if (!tpl) return;
     if (panelCleanup) { panelCleanup(); panelCleanup = null; }
     panelBody.innerHTML = "";
     panelBody.appendChild(tpl.content.cloneNode(true));
-    panel.hidden = false;
     panel.dataset.k = k;
-    root.classList.add("mind--panel");
-    stars.forEach(function (b) { b.classList.toggle("is-on", b.dataset.k === k); b.setAttribute("aria-pressed", b.dataset.k === k); });
-    requestAnimationFrame(function () { panel.classList.add("is-open"); });
+    var i = KEYS.indexOf(k), n = KEYS.length;
+    swCount.textContent = ("0" + (i + 1)).slice(-2) + " / 0" + n;
+    swPrev.querySelector(".msw-name").textContent = NAMES[(i - 1 + n) % n];
+    swNext.querySelector(".msw-name").textContent = NAMES[(i + 1) % n];
+    swPrev.setAttribute("aria-label", "Previous: " + NAMES[(i - 1 + n) % n]);
+    swNext.setAttribute("aria-label", "Next: " + NAMES[(i + 1) % n]);
     var h = panelBody.querySelector("h3");
     if (h) h.focus({ preventScroll: true });
     panelCleanup = (PANELS[k] || function () { return null; })(panelBody) || null;
-    if (gx) gx.select(KEYS.indexOf(k));
   }
+  function openPanel(k, dir) {
+    if (!root.querySelector('template[data-k="' + k + '"]')) return;
+    var wasOpen = !panel.hidden && panel.classList.contains("is-open");
+    stars.forEach(function (b) { b.classList.toggle("is-on", b.dataset.k === k); b.setAttribute("aria-pressed", b.dataset.k === k); });
+    root.classList.add("mind--panel");
+    if (gx) gx.select(KEYS.indexOf(k));
+    var my = ++swapToken;
+    if (wasOpen && panel.dataset.k !== k && !reduced) {
+      // Slide the old content out, then the new one in from the side we are moving towards.
+      panelBody.dataset.dir = dir < 0 ? "prev" : "next";
+      panelBody.classList.add("is-swap-out");
+      setTimeout(function () {
+        if (my !== swapToken) return;
+        fillPanel(k);
+        panelBody.classList.remove("is-swap-out");
+        panelBody.classList.add("is-swap-in");
+        requestAnimationFrame(function () { requestAnimationFrame(function () { panelBody.classList.remove("is-swap-in"); }); });
+      }, 190);
+      return;
+    }
+    panel.hidden = false;
+    fillPanel(k);
+    requestAnimationFrame(function () { panel.classList.add("is-open"); });
+  }
+  function switchBy(d) {
+    var i = KEYS.indexOf(panel.dataset.k);
+    if (i < 0 || panel.hidden) i = d > 0 ? -1 : 0;
+    openPanel(KEYS[(i + d + KEYS.length) % KEYS.length], d);
+  }
+  swPrev.addEventListener("click", function () { switchBy(-1); });
+  swNext.addEventListener("click", function () { switchBy(1); });
+  // Swipe left or right on the panel (not on the interactive canvases) to switch.
+  var sw0 = null;
+  panel.addEventListener("pointerdown", function (e) {
+    sw0 = (e.pointerType === "touch" && !e.target.closest("canvas")) ? [e.clientX, e.clientY] : null;
+  });
+  panel.addEventListener("pointerup", function (e) {
+    if (!sw0) return;
+    var dx = e.clientX - sw0[0], dy = e.clientY - sw0[1]; sw0 = null;
+    if (Math.abs(dx) > 60 && Math.abs(dy) < 45) switchBy(dx < 0 ? 1 : -1);
+  });
   function closePanel() {
     if (panel.hidden) return;
+    swapToken++;
+    panelBody.classList.remove("is-swap-out", "is-swap-in");
     if (panelCleanup) { panelCleanup(); panelCleanup = null; }
     panel.classList.remove("is-open");
     root.classList.remove("mind--panel");
@@ -46,7 +91,8 @@
     setTimeout(function () { if (!panel.classList.contains("is-open")) { panel.hidden = true; panelBody.innerHTML = ""; } }, 320);
     if (gx) gx.select(-1);
     var b = root.querySelector('.mind-star[data-k="' + k + '"]');
-    if (b) b.focus({ preventScroll: true });
+    if (b && !b.classList.contains("is-hidden")) b.focus({ preventScroll: true });
+    if (document.activeElement === document.body && !backBtn.hidden) backBtn.focus({ preventScroll: true });
   }
   stars.forEach(function (b) {
     b.setAttribute("aria-pressed", "false");
@@ -55,7 +101,12 @@
     });
   });
   root.querySelector(".mind-close").addEventListener("click", closePanel);
-  root.addEventListener("keydown", function (e) {
+  document.addEventListener("keydown", function (e) {
+    var inside = root.contains(document.activeElement) || root.classList.contains("mind--immersive");
+    if (!inside || e.defaultPrevented) return;
+    if ((e.key === "ArrowRight" || e.key === "ArrowLeft") && !panel.hidden) {
+      e.preventDefault(); switchBy(e.key === "ArrowRight" ? 1 : -1); return;
+    }
     if (e.key !== "Escape") return;
     if (!panel.hidden) closePanel(); else if (root.classList.contains("mind--immersive") && exitMind) exitMind();
   });
@@ -124,9 +175,8 @@
     function play(d, img) {
       var box = cv.parentNode.getBoundingClientRect();
       var dpr = Math.min(window.devicePixelRatio || 1, 2);
-      var aspect = d.h / d.w;
-      var w = Math.max(200, box.width), h = Math.min(w * aspect, window.innerHeight * 0.52);
-      w = h / aspect;
+      var aspect = d.h / d.w, bw = Math.max(160, box.width - 16), bh = box.height > 120 ? box.height - 16 : window.innerHeight * 0.5;
+      var h = Math.min(bh, bw * aspect), w = h / aspect;
       cv.style.width = w + "px"; cv.style.height = h + "px";
       cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -160,16 +210,21 @@
     el.querySelector(".sk-next").addEventListener("click", function () { show(drawIdx + 1); });
     el.querySelector(".sk-replay").addEventListener("click", function () { show(drawIdx); });
     show(drawIdx);
-    return function () { alive = false; cancelAnimationFrame(raf); };
+    var ro = window.ResizeObserver ? new ResizeObserver(function () {
+      if (first) { first = false; return; }
+      clearTimeout(ro.t); ro.t = setTimeout(function () { if (alive) show(drawIdx); }, 250);
+    }) : null, first = true;
+    if (ro) ro.observe(cv.parentNode);
+    return function () { alive = false; cancelAnimationFrame(raf); if (ro) ro.disconnect(); };
   }
 
   /* ---------- research panel: a small boids model ---------- */
   function flockPanel(el) {
     var cv = el.querySelector(".flock-canvas"), ctx = cv.getContext("2d");
-    var w = cv.parentNode.clientWidth, h = Math.round(w * 0.55), dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = cv.parentNode.clientWidth, ph = cv.parentNode.clientHeight, h = ph > 120 ? ph : Math.round(w * 0.55), dpr = Math.min(window.devicePixelRatio || 1, 2);
     cv.width = w * dpr; cv.height = h * dpr; cv.style.width = w + "px"; cv.style.height = h + "px";
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    var B = [], n = w < 400 ? 55 : 80, mx = -999, my = -999, raf = 0;
+    var B = [], n = Math.round(Math.max(50, Math.min(140, w * h / 4500))), mx = -999, my = -999, raf = 0;
     for (var i = 0; i < n; i++) B.push({ x: Math.random() * w, y: Math.random() * h, vx: Math.random() * 2 - 1, vy: Math.random() * 2 - 1 });
     function move(e) { var r = cv.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; }
     cv.addEventListener("pointermove", move);
@@ -221,8 +276,13 @@
     "  vec3 fp = uFaceRot * f * 0.82 + vec3(uFaceOff, 0.0);",
     "  vec3 gp = uGalRot * aGal;",
     "  float b = sin(3.14159 * e);",
-    "  vec3 swirl = vec3(sin(aR.x*90.0 + uTime*0.7), cos(aR.x*70.0), sin(aR.x*50.0 + 1.0)) * b * (0.5 + aR.y*0.4);",
-    "  vec3 w = mix(fp, gp, e) + swirl;",
+    "  vec3 m = mix(fp, gp, e);",
+    // Particles sweep around the vertical axis as they travel, so the galaxy spins out of the face.
+    "  float th = b * (1.1 + aR.y * 0.6); float cs = cos(th), sn = sin(th);",
+    "  m = vec3(m.x*cs + m.z*sn, m.y, -m.x*sn + m.z*cs);",
+    "  m.xz *= 1.0 + 0.35*b; m.y += 0.12*b*sin(aR.x*40.0);",
+    "  vec3 swirl = vec3(sin(aR.x*90.0 + uTime*0.7), cos(aR.x*70.0), sin(aR.x*50.0 + 1.0)) * b * 0.16;",
+    "  vec3 w = m + swirl;",
     "  vec3 v = w - uCam; float zc = -v.z;",
     "  gl_Position = zc > 0.05 ? vec4(v.x*uF/uAspect, v.y*uF, 0.0, zc) : vec4(2.0, 2.0, 2.0, 1.0);",
     "  float scan = exp(-pow((aFace.y - uScan) * 9.0, 2.0));",
@@ -343,15 +403,21 @@
     layoutTargets();
   }
   function wide() { return W / H > 1.15 && W > 760; }
+  // Three columns (galaxy | text | showcase) when the window is wide; otherwise a galaxy strip on top.
+  var COLS = window.matchMedia("(min-width: 1000px) and (min-aspect-ratio: 6/5)");
+  function threeCol() { return COLS.matches; }
   function faceOffset() { return wide() ? [0.95, -0.05] : [0, -0.42]; }
   function layoutTargets() {
     if (S.mode === "face") { S.camT = [0, 0, wide() ? 3.7 : 4.3]; return; }
-    var far = wide() ? 5.2 : 7.0;
+    // Pull back far enough that the whole ring fits the width (phones are narrow).
+    var far = Math.max(wide() ? 5.2 : 7.0, 2.05 / (Math.tan(0.31) * (W / H)));
     if (S.sel < 0) { S.camT = [0, 0.15, far]; return; }
-    // Frame the chosen cluster: left of the panel on wide screens, above the sheet on phones.
+    // Put the chosen cluster in the middle of the free area: the left column, or the strip above the panel.
     var yaw = S.yawT === null ? S.yaw : S.yawT;
     var Cw = apply(mul(rotX(0.25), rotY(yaw)), CENTERS[S.sel]);
-    S.camT = wide() ? [Cw[0] + 0.62, Cw[1] + 0.02, Cw[2] + 2.3] : [Cw[0], Cw[1] - 0.55, Cw[2] + 3.0];
+    var F = 1 / Math.tan(0.31), aspect = W / H;
+    var nx = threeCol() ? -0.7 : 0, ny = threeCol() ? 0 : 0.68, dist = threeCol() ? 1.75 : 2.3;
+    S.camT = [Cw[0] - nx * dist * aspect / F, Cw[1] - ny * dist / F, Cw[2] + dist];
   }
 
   function project(v) {
@@ -429,10 +495,12 @@
     if (S.mode === "galaxy") return;
     goImmersive();
     S.mode = "galaxy"; S.pT = 1; S.yawT = null;
+    // On tall screens look at the ring from higher up, so it spreads vertically instead of a thin band.
+    S.pitch = W / H < 0.9 ? 0.95 : 0.32;
     root.classList.add("mind--galaxy");
     backBtn.hidden = false; hint.hidden = false;
     layoutTargets();
-    setTimeout(function () { stars[0] && stars[0].focus({ preventScroll: true }); }, 50);
+    setTimeout(function () { backBtn.focus({ preventScroll: true }); }, 50);
   }
   function leave() {
     closePanel();
@@ -481,13 +549,19 @@
     if (moved > 6) return;
     if (S.mode === "face") { enter(); return; }
     var r = stage.getBoundingClientRect(), k = pick(e.clientX - r.left, e.clientY - r.top);
-    if (k >= 0) openPanel(KEYS[k]); else if (!panel.hidden) closePanel();
+    var cur = KEYS.indexOf(panel.dataset.k);
+    if (k >= 0) openPanel(KEYS[k], k > cur ? 1 : -1); else if (!panel.hidden) closePanel();
   });
   canvas.addEventListener("pointerleave", function () { S.hot = -1; S.fyawT = 0; S.fpitchT = 0; });
+  function underPanel(x, y) {
+    if (panel.hidden) return false;
+    return threeCol() ? x > W * 0.3 - 8 : y > H * 0.32 - 8;
+  }
   function pick(x, y) {
     var m = galRot(), best = -1, bd = 70 * 70;
+    if (underPanel(x, y)) return -1;
     for (var i = 0; i < 7; i++) {
-      var p = project(apply(m, CENTERS[i])); if (!p) continue;
+      var p = project(apply(m, CENTERS[i])); if (!p || underPanel(p[0], p[1])) continue;
       var d = (p[0] - x) * (p[0] - x) + (p[1] - y) * (p[1] - y);
       if (d < bd) { bd = d; best = i; }
     }
@@ -501,6 +575,42 @@
   });
 
   function lerp(a, b, k) { return a + (b - a) * k; }
+
+  /* Seven leader particles leave from points of the face (eyes, brows, mouth, nose) ahead of the rest,
+     fly the same ring-like path as the shader, and become the stars; their labels unfold on arrival. */
+  var LEAD_FROM = [[-0.35, 0.27, 0.29], [0.44, 0.49, 0.33], [-0.25, -0.49, 0.41], [0.35, 0.27, 0.29],
+                   [-0.44, 0.49, 0.33], [0.25, -0.49, 0.41], [0, -0.18, 0.66]];
+  var LEAD_DELAY = [0.02, 0.06, 0.1, 0.04, 0.08, 0.12, 0.0], LEAD_SPIN = [1.5, 1.3, 1.6, 1.4, 1.2, 1.55, 1.35];
+  var lastPos = [], lastState = [];
+  function smooth(x) { x = Math.max(0, Math.min(1, x)); return x * x * (3 - 2 * x); }
+  function placeLeaders(off) {
+    var fr = mul(rotX(S.fpitch), rotY(S.fyaw)), gr = galRot(), uP = S.p * 1.35;
+    for (var i = 0; i < 7; i++) {
+      var b = stars[i], e = smooth((uP - LEAD_DELAY[i]) / 0.65);
+      var f = apply(fr, LEAD_FROM[i]); f = [f[0] * 0.82 + off[0], f[1] * 0.82 + off[1], f[2] * 0.82];
+      var g = apply(gr, CENTERS[i]);
+      var m = [lerp(f[0], g[0], e), lerp(f[1], g[1], e), lerp(f[2], g[2], e)];
+      var bb = Math.sin(Math.PI * e), th = bb * LEAD_SPIN[i], cs = Math.cos(th), sn = Math.sin(th);
+      var x = (m[0] * cs + m[2] * sn) * (1 + 0.35 * bb), z = (-m[0] * sn + m[2] * cs) * (1 + 0.35 * bb);
+      var p = project([x, m[1], z]);
+      var visible = p && S.p > 0.002, born = visible && e > 0.995 && S.mode === "galaxy";
+      var hidden = !visible || (born && underPanel(p[0], p[1]));
+      var state = (hidden ? "h" : "v") + (born ? "b" : "") + (S.sel >= 0 && S.sel !== i ? "d" : "") + (p && p[0] > (!panel.hidden && threeCol() ? W * 0.3 - 175 : W - 190) ? "l" : "");
+      if (state !== lastState[i]) {
+        lastState[i] = state;
+        b.classList.toggle("is-hidden", hidden);
+        b.classList.toggle("is-born", born);
+        b.classList.toggle("is-dim", state.indexOf("d") >= 0);
+        b.classList.toggle("is-left", state.indexOf("l") >= 0);
+      }
+      if (p && !hidden) {
+        var tr = "translate(" + p[0].toFixed(1) + "px," + p[1].toFixed(1) + "px)";
+        if (tr !== lastPos[i]) { lastPos[i] = tr; b.style.transform = tr; }
+        var a = Math.min(1, S.p * 5).toFixed(2);
+        if (b._a !== a) { b._a = a; b.style.setProperty("--a", a); }
+      }
+    }
+  }
   function frame(now) {
     if (!running) return;
     var dt = Math.min(0.05, (now - last) / 1000), t = (now - t0) / 1000; last = now; idle += dt;
@@ -542,16 +652,7 @@
     gl.uniform1f(U.uSel, S.sel);
     gl.drawArrays(gl.POINTS, 0, N);
 
-    // Float the interest labels next to their clusters.
-    var m = galRot(), show = S.p > 0.8;
-    for (var i = 0; i < 7; i++) {
-      var p = show ? project(apply(m, CENTERS[i])) : null, b = stars[i];
-      if (!p) { b.style.transform = ""; continue; }
-      var front = Math.max(0.35, Math.min(1, 1.6 - p[2] / 6));
-      var lx2 = Math.max(6, Math.min(W - b.offsetWidth - 6, p[0] + 14)), ly2 = Math.max(58, Math.min(H - b.offsetHeight - 6, p[1] - 12));
-      b.style.transform = "translate(" + lx2.toFixed(1) + "px," + ly2.toFixed(1) + "px)";
-      b.style.opacity = (S.sel >= 0 && S.sel !== i ? 0.45 : front).toFixed(2);
-    }
+    placeLeaders(off);
     requestAnimationFrame(frame);
   }
   function setRunning(on) {
