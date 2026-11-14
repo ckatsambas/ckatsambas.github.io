@@ -139,7 +139,8 @@
     var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     var W = 0, H = 0, dpr = 1, raf = 0, alive = true, t0 = performance.now();
     var view = { yaw: opts.yaw, pitch: opts.pitch || 0.08, drag: 0 }, dragging = false, lx = 0;
-    var body = sampleBody(opts.points || 3400, rnd(11), opts.extra);
+    // Fewer points on small screens keeps phones smooth.
+    var body = sampleBody(opts.points || (Math.min(screen.width, screen.height) < 700 ? 2400 : 3400), rnd(11), opts.extra);
     var buf = new Float32Array(body.n * 3);
     function size() {
       var w = el.clientWidth, h = el.clientHeight;

@@ -67,6 +67,27 @@
     if (i < 0 || panel.hidden) i = d > 0 ? -1 : 0;
     openPanel(KEYS[(i + d + KEYS.length) % KEYS.length], d);
   }
+  // On phones the panel is a sheet: drag its grabber (or its top when scrolled up) down to close it.
+  var grab = root.querySelector(".mind-grab"), drag0 = null;
+  panel.addEventListener("pointerdown", function (e) {
+    if (e.pointerType !== "touch" || panel.scrollTop > 0 || !e.target.closest(".mind-grab, .mp-kicker, .mind-panel h3")) return;
+    if (window.matchMedia("(min-width: 1000px), (orientation: landscape) and (max-height: 520px)").matches) return;
+    drag0 = { y: e.clientY, t: performance.now() };
+  });
+  panel.addEventListener("pointermove", function (e) {
+    if (!drag0) return;
+    var dy = Math.max(0, e.clientY - drag0.y);
+    if (dy > 6) { panel.style.transition = "none"; panel.style.transform = "translateY(" + dy + "px)"; }
+  });
+  function endDrag(e) {
+    if (!drag0) return;
+    var dy = e.clientY - drag0.y, fast = dy / Math.max(1, performance.now() - drag0.t) > 0.6;
+    drag0 = null; panel.style.transition = ""; panel.style.transform = "";
+    if (dy > 110 || (fast && dy > 40)) closePanel();
+  }
+  panel.addEventListener("pointerup", endDrag);
+  panel.addEventListener("pointercancel", function () { drag0 = null; panel.style.transition = ""; panel.style.transform = ""; });
+  if (grab) grab.addEventListener("click", closePanel);
   swPrev.addEventListener("click", function () { switchBy(-1); });
   swNext.addEventListener("click", function () { switchBy(1); });
   // Swipe left or right on the panel (not on the interactive canvases) to switch.
@@ -362,14 +383,14 @@
         col.set([0.5, 0.75, 1.0], i * 3); wgal = 0.15 + r() * 0.2;
       } else { // a small spiral nebula per interest
         cl = Math.floor(r() * 7);
-        var rad2 = Math.abs(gauss(r)) * 0.3 + (r() < 0.25 ? 0 : 0.04);
+        var rad2 = (Math.abs(gauss(r)) * 0.3 + (r() < 0.25 ? 0 : 0.04)) * (mobile ? 1.45 : 1);
         var arm = (r() < 0.5 ? 0 : 3.14159), ang = rad2 * 7 + arm + gauss(r) * 0.35;
         var lp = apply(tilts[cl], [Math.cos(ang) * rad2, gauss(r) * 0.03, Math.sin(ang) * rad2]);
         var C = CENTERS[cl];
         g = [C[0] + lp[0], C[1] + lp[1], C[2] + lp[2]];
-        var cc = COLORS[cl], mixw = Math.min(1, rad2 * 2.6);
+        var cc = COLORS[cl], mixw = Math.min(1, rad2 / (mobile ? 1.45 : 1) * 2.6);
         col.set([cc[0] + (1 - cc[0]) * (1 - mixw) * 0.6, cc[1] + (1 - cc[1]) * (1 - mixw) * 0.6, cc[2] + (1 - cc[2]) * (1 - mixw) * 0.6], i * 3);
-        wgal = Math.max(0.12, 1 - rad2 * 2.4);
+        wgal = Math.max(0.12, 1 - rad2 / (mobile ? 1.45 : 1) * 2.4);
       }
       gal.set(g, i * 3);
       R.set([r() * 0.35, 0.7 + r() * 0.9, cl, 0], i * 4);
@@ -406,6 +427,9 @@
   // Three columns (galaxy | text | showcase) when the window is wide; otherwise a galaxy strip on top.
   var COLS = window.matchMedia("(min-width: 1000px) and (min-aspect-ratio: 6/5)");
   function threeCol() { return COLS.matches; }
+  // Phones held sideways: galaxy on the left 38%, panel on the right.
+  var SIDE = window.matchMedia("(orientation: landscape) and (max-height: 520px)");
+  function sideFrac() { return threeCol() ? 0.3 : SIDE.matches ? 0.38 : 0; }
   function faceOffset() { return wide() ? [0.95, -0.05] : [0, -0.42]; }
   function layoutTargets() {
     if (S.mode === "face") { S.camT = [0, 0, wide() ? 3.7 : 4.3]; return; }
@@ -416,7 +440,7 @@
     var yaw = S.yawT === null ? S.yaw : S.yawT;
     var Cw = apply(mul(rotX(0.25), rotY(yaw)), CENTERS[S.sel]);
     var F = 1 / Math.tan(0.31), aspect = W / H;
-    var nx = threeCol() ? -0.7 : 0, ny = threeCol() ? 0 : 0.68, dist = threeCol() ? 1.75 : 2.3;
+    var sf = sideFrac(), nx = sf ? sf - 1 : 0, ny = sf ? 0 : 0.68, dist = threeCol() ? 1.75 : sf ? 1.9 : 2.3;
     S.camT = [Cw[0] - nx * dist * aspect / F, Cw[1] - ny * dist / F, Cw[2] + dist];
   }
 
@@ -555,7 +579,8 @@
   canvas.addEventListener("pointerleave", function () { S.hot = -1; S.fyawT = 0; S.fpitchT = 0; });
   function underPanel(x, y) {
     if (panel.hidden) return false;
-    return threeCol() ? x > W * 0.3 - 8 : y > H * 0.32 - 8;
+    var sf = sideFrac();
+    return sf ? x > W * sf - 8 : y > H * 0.32 - 8;
   }
   function pick(x, y) {
     var m = galRot(), best = -1, bd = 70 * 70;
@@ -584,7 +609,8 @@
   var lastPos = [], lastState = [];
   function smooth(x) { x = Math.max(0, Math.min(1, x)); return x * x * (3 - 2 * x); }
   function placeLeaders(off) {
-    var fr = mul(rotX(S.fpitch), rotY(S.fyaw)), gr = galRot(), uP = S.p * 1.35;
+    var fr = mul(rotX(S.fpitch), rotY(S.fyaw)), gr = galRot(), uP = S.p * 1.35, items = [];
+    var limit = !panel.hidden && sideFrac() ? W * sideFrac() : W;
     for (var i = 0; i < 7; i++) {
       var b = stars[i], e = smooth((uP - LEAD_DELAY[i]) / 0.65);
       var f = apply(fr, LEAD_FROM[i]); f = [f[0] * 0.82 + off[0], f[1] * 0.82 + off[1], f[2] * 0.82];
@@ -595,22 +621,47 @@
       var p = project([x, m[1], z]);
       var visible = p && S.p > 0.002, born = visible && e > 0.995 && S.mode === "galaxy";
       var hidden = !visible || (born && underPanel(p[0], p[1]));
-      var state = (hidden ? "h" : "v") + (born ? "b" : "") + (S.sel >= 0 && S.sel !== i ? "d" : "") + (p && p[0] > (!panel.hidden && threeCol() ? W * 0.3 - 175 : W - 190) ? "l" : "");
-      if (state !== lastState[i]) {
-        lastState[i] = state;
-        b.classList.toggle("is-hidden", hidden);
-        b.classList.toggle("is-born", born);
-        b.classList.toggle("is-dim", state.indexOf("d") >= 0);
-        b.classList.toggle("is-left", state.indexOf("l") >= 0);
+      if (born && !b._tw) { var t = b.querySelector(".ms-text"); b._tw = t.offsetWidth; b._th = t.offsetHeight; }
+      items.push({ i: i, b: b, p: p, born: born, hidden: hidden, left: !!(p && p[0] + 16 + (b._tw || 120) > limit - 6), dy: 0 });
+    }
+    // Keep labels from sitting on top of each other: flip sides first, then nudge vertically.
+    var live = items.filter(function (it) { return it.born && !it.hidden; }).sort(function (a, c) { return a.p[1] - c.p[1]; });
+    function box(it) {
+      var w = it.b._tw || 120, h = it.b._th || 34, x0 = it.left ? it.p[0] - 16 - w : it.p[0] + 16;
+      return [x0, it.p[1] - h / 2 + it.dy, x0 + w, it.p[1] + h / 2 + it.dy];
+    }
+    function hit(a, c) { var A = box(a), C = box(c); return A[0] < C[2] && C[0] < A[2] && A[1] < C[3] && C[1] < A[3]; }
+    for (var k = 1; k < live.length; k++) {
+      for (var q = 0; q < k; q++) {
+        if (!hit(live[q], live[k])) continue;
+        live[k].left = !live[k].left;
+        if (hit(live[q], live[k]) || box(live[k])[0] < 4 || box(live[k])[2] > limit - 4) {
+          live[k].left = !live[k].left;
+          var A = box(live[q]), C = box(live[k]);
+          live[k].dy += A[3] - C[1] + 4;
+        }
       }
-      if (p && !hidden) {
-        var tr = "translate(" + p[0].toFixed(1) + "px," + p[1].toFixed(1) + "px)";
-        if (tr !== lastPos[i]) { lastPos[i] = tr; b.style.transform = tr; }
+    }
+    for (var n = 0; n < items.length; n++) {
+      var it = items[n], b2 = it.b, i2 = it.i, p2 = it.p;
+      var state = (it.hidden ? "h" : "v") + (it.born ? "b" : "") + (S.sel >= 0 && S.sel !== i2 ? "d" : "") + (it.left ? "l" : "") + Math.round(it.dy);
+      if (state !== lastState[i2]) {
+        lastState[i2] = state;
+        b2.classList.toggle("is-hidden", it.hidden);
+        b2.classList.toggle("is-born", it.born);
+        b2.classList.toggle("is-dim", S.sel >= 0 && S.sel !== i2);
+        b2.classList.toggle("is-left", it.left);
+        b2.style.setProperty("--dy", Math.round(it.dy) + "px");
+      }
+      if (p2 && !it.hidden) {
+        var tr = "translate(" + p2[0].toFixed(1) + "px," + p2[1].toFixed(1) + "px)";
+        if (tr !== lastPos[i2]) { lastPos[i2] = tr; b2.style.transform = tr; }
         var a = Math.min(1, S.p * 5).toFixed(2);
-        if (b._a !== a) { b._a = a; b.style.setProperty("--a", a); }
+        if (b2._a !== a) { b2._a = a; b2.style.setProperty("--a", a); }
       }
     }
   }
+
   function frame(now) {
     if (!running) return;
     var dt = Math.min(0.05, (now - last) / 1000), t = (now - t0) / 1000; last = now; idle += dt;
@@ -683,6 +734,6 @@
   }, { rootMargin: "300px 0px" });
   io.observe(stage);
   document.addEventListener("visibilitychange", function () { setRunning(visible && !document.hidden); });
-  window.addEventListener("resize", function () { if (started) resize(); });
+  window.addEventListener("resize", function () { if (started) { resize(); stars.forEach(function (b) { b._tw = 0; }); } });
   canvas.addEventListener("webglcontextlost", function (e) { e.preventDefault(); running = false; root.classList.add("mind--static"); });
 })();
