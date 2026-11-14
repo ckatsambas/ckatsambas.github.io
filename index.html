@@ -17,7 +17,7 @@
 <meta property="og:image:alt" content="Christos Katsampas – Personal Project Portfolio">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=25c7dddc3f">
+<link rel="stylesheet" href="assets/style.css?v=c6a9bb641c">
 </head>
 <body>
 <header class="site-head">
@@ -158,7 +158,7 @@
 <button class="mind-star" type="button" data-k="run" style="--i:2;--c:#7cf0b0"><i class="ms-dot" aria-hidden="true"></i><span class="ms-text"><b>Running</b><small>10 km is home</small></span></button>
 <button class="mind-star" type="button" data-k="research" style="--i:3;--c:#8fdcff"><i class="ms-dot" aria-hidden="true"></i><span class="ms-text"><b>Research</b><small>People &amp; society</small></span></button>
 <button class="mind-star" type="button" data-k="gaming" style="--i:4;--c:#c59bff"><i class="ms-dot" aria-hidden="true"></i><span class="ms-text"><b>Gaming</b><small>CS &middot; COD &middot; Souls</small></span></button>
-<button class="mind-star" type="button" data-k="read" style="--i:5;--c:#ffd27a"><i class="ms-dot" aria-hidden="true"></i><span class="ms-text"><b>Reading</b><small>Classics &amp; Stoics</small></span></button>
+<button class="mind-star" type="button" data-k="read" style="--i:5;--c:#ffd27a"><i class="ms-dot" aria-hidden="true"></i><span class="ms-text"><b>Reading &amp; film</b><small>Books &middot; films</small></span></button>
 <button class="mind-star" type="button" data-k="music" style="--i:6;--c:#ff7ac8"><i class="ms-dot" aria-hidden="true"></i><span class="ms-text"><b>Music</b><small>Rock &amp; jazz</small></span></button>
       </nav>
       <div class="mind-tools">
@@ -254,14 +254,31 @@
 
   <template data-k="read">
     <div class="mp-text">
-      <p class="mp-kicker">06 &middot; Reading</p>
-      <h3 tabindex="-1">On the desk, and on the shelf</h3>
-      <p>Two books I&rsquo;m reading now, and five that stayed with me.</p>
+      <p class="mp-kicker">06 &middot; Reading &amp; film</p>
+      <h3 tabindex="-1">Books on the desk, films on the screen</h3>
+      <p>Classics and Stoics on paper. On screen, anything from Pixar to <i>Cinema Paradiso</i>.</p>
+      <div class="rf-stats">
+        <a href="https://www.goodreads.com/user/show/148873760-chris" target="_blank" rel="noopener"><b>35</b><span>books read &middot; Goodreads <span aria-hidden="true">&nearr;</span></span></a>
+        <a href="https://letterboxd.com/Ckatsambas/" target="_blank" rel="noopener"><b>222</b><span>films logged &middot; Letterboxd <span aria-hidden="true">&nearr;</span></span></a>
+      </div>
     </div>
     <div class="mp-show">
-      <div class="shelves">
-        <div><p class="shelf-label">Reading now</p><ul class="shelf"><li class="spine s0"><span>The Prince</span><small>Niccol&ograve; Machiavelli</small></li><li class="spine s1"><span>Meditations</span><small>Marcus Aurelius</small></li></ul></div>
-        <div><p class="shelf-label">Favourites</p><ul class="shelf"><li class="spine s2"><span>Great Expectations</span><small>Charles Dickens</small></li><li class="spine s3"><span>The Picture of Dorian Gray</span><small>Oscar Wilde</small></li><li class="spine s4"><span>Psycho-Pass</span><small>Manga</small></li><li class="spine s5"><span>Siddhartha</span><small>Hermann Hesse</small></li><li class="spine s6"><span>The Bible</span></li></ul></div>
+      <div class="rf">
+        <div class="rf-tabs" role="tablist" aria-label="Books or films">
+          <button type="button" role="tab" aria-selected="true" data-tab="books">Books</button>
+          <button type="button" role="tab" aria-selected="false" data-tab="films">Films</button>
+        </div>
+        <div class="rf-pane shelves" data-pane="books" role="tabpanel">
+          <div><p class="shelf-label">Reading now</p><ul class="shelf"><li class="spine s0"><span>The Prince</span><small>Niccol&ograve; Machiavelli</small></li><li class="spine s1"><span>Meditations</span><small>Marcus Aurelius</small></li></ul></div>
+          <div><p class="shelf-label">Favourites</p><ul class="shelf"><li class="spine s2"><span>Great Expectations</span><small>Charles Dickens</small></li><li class="spine s3"><span>The Picture of Dorian Gray</span><small>Oscar Wilde</small></li><li class="spine s4"><span>Psycho-Pass</span><small>Manga</small></li><li class="spine s5"><span>Siddhartha</span><small>Hermann Hesse</small></li><li class="spine s6"><span>The Bible</span></li></ul></div>
+        </div>
+        <div class="rf-pane" data-pane="films" role="tabpanel" hidden>
+          <p class="shelf-label">Four favourites</p>
+          <ol class="filmstrip"><li><span class="fm-n">01</span><b>WALL&middot;E</b><small>2008</small></li><li><span class="fm-n">02</span><b>The Pursuit of Happyness</b><small>2006</small></li><li><span class="fm-n">03</span><b>Cinema Paradiso</b><small>1988</small></li><li><span class="fm-n">04</span><b>The Empire Strikes Back</b><small>1980</small></li></ol>
+          <p class="shelf-label">How I rate &middot; 213 films</p>
+          <div class="rate-hist" role="img" aria-label="Rating distribution: mostly 3.5 to 5 stars, with 5 stars the most common"><i style="--h:0.000" title="0.5 stars: 0"></i><i style="--h:0.075" title="1 stars: 4"></i><i style="--h:0.057" title="1.5 stars: 3"></i><i style="--h:0.057" title="2 stars: 3"></i><i style="--h:0.113" title="2.5 stars: 6"></i><i style="--h:0.434" title="3 stars: 23"></i><i style="--h:0.830" title="3.5 stars: 44"></i><i style="--h:0.925" title="4 stars: 49"></i><i style="--h:0.528" title="4.5 stars: 28"></i><i style="--h:1.000" title="5 stars: 53"></i></div>
+          <div class="rate-axis"><span>&frac12;&#9733;</span><span>5&#9733;</span></div>
+        </div>
       </div>
     </div>
   </template>
@@ -313,6 +330,6 @@
   </div>
 </footer>
 <script src="assets/about/holo.js?v=927ca92a5d" defer></script>
-<script src="assets/about/mind.js?v=07a3e7cb57" defer></script>
+<script src="assets/about/mind.js?v=d963a2b51d" defer></script>
 </body>
 </html>

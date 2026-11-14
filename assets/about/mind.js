@@ -142,6 +142,15 @@
     },
     run: function (el) { return window.MindHolo ? window.MindHolo.run(el.querySelector(".holo")) : null; },
     research: flockPanel,
+    read: function (el) {
+      var tabs = el.querySelectorAll("[data-tab]");
+      tabs.forEach(function (t) {
+        t.addEventListener("click", function () {
+          tabs.forEach(function (o) { o.setAttribute("aria-selected", o === t); });
+          el.querySelectorAll("[data-pane]").forEach(function (p) { p.hidden = p.dataset.pane !== t.dataset.tab; });
+        });
+      });
+    },
     music: function (el) {
       var btn = el.querySelector(".song-load");
       btn.addEventListener("click", function () {
